@@ -205,3 +205,5 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+/.vs/Demystifying-LMs/CopilotIndices/17.14.1091.29919
+/.vs
