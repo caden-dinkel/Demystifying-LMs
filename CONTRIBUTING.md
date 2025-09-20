@@ -30,5 +30,9 @@ git push origin bug_fix/{name}
 
 ## 5). Make a pull request to testing branch from feature branch
 
-Can be done best using GitHub UI so we can go over added code in team meetings.
-![Navigate to Create a Pull Request Button](images/PullRequest1.png)
+### 1). Navigate to Create a Pull Request button.
+![PullRequest](images/PullRequest1.png)
+
+### 2). Create a pull request, ensuring merging into correct branch.
+![PullRequest2](images/PullRequest2.png)
+
