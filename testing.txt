@@ -1,3 +1,3 @@
-The testing branch is for staging code as it is developed. 
+This branch is for staging code as it is developed. 
 The main branch should always be functional.
 When writing new code, make a local branch of this testing branch, write your code, and then pull your code into the testing branch once it's functional. 
