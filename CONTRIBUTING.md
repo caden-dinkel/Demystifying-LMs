@@ -31,3 +31,4 @@ git push origin bug_fix/{name}
 ## 5). Make a pull request to testing branch from feature branch
 
 Can be done best using GitHub UI so we can go over added code in team meetings.
+![Navigate to Create a Pull Request Button](images/PullRequest1.png)
