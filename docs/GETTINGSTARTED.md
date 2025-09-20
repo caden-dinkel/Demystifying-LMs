@@ -8,6 +8,7 @@ git clone git@github.com:caden-dinkel/Demystifying-LMs.git
 ```
 cd 'Demystifying-LMs'
 ```
+
 ## 3). Switch between branches to change state of directory.
 ```
 git checkout main
