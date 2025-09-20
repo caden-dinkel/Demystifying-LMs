@@ -1,10 +1,15 @@
 # To Make a Change (add a feature, fix bug, etc.)
-## 1). Update local repository to newest testing branch.
+## 1). Update local repository to newest.
 ```
-git pull origin testing
+git pull
 ```
 
-## 2). Create a new branch for new change.
+## 2). Navigate to testing branch.
+```
+git checkout testing
+```
+
+## 3). Create a new branch for new change.
 ```
 git checkout -b feature/{name}
 ```
