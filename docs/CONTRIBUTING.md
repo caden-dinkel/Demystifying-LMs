@@ -34,5 +34,5 @@ git push origin bug_fix/{name}
 ![PullRequest](images/PullRequest1.png)
 
 ### 2). Create a pull request, ensuring merging into correct branch.
-![PullRequest2](images/PullRequest2.png)
+![PullRequest2](./images/PullRequest2.png)
 
