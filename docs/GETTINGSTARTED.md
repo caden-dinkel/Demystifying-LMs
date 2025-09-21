@@ -22,4 +22,18 @@ git checkout main
 git checkout testing
 ```
 
-## 3). Make Changes according to [CONTRIBUTING.md](CONTRIBUTING.md#to-make-a-change-add-a-feature-fix-bug-etc).
+## 4). Ensure Node and Python Packages are installed.
+
+```
+npm install
+```
+
+```
+cd backend
+```
+
+```
+pip install -r requirements.txt
+```
+
+## 5). Make Changes according to [CONTRIBUTING.md](CONTRIBUTING.md#to-make-a-change-add-a-feature-fix-bug-etc).
