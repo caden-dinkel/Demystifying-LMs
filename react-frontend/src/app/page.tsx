@@ -6,14 +6,45 @@ import styles from "./page.module.css"; // We'll use this for styling
 
 export default function Home() {
   // State to hold the user's input prompt
-  const [prompt, setPrompt] = useState("");
   // State to hold the generated text from the model
+
+  const [dictResult, setDictResult] = useState({});
+  // State to track if the model is currently generating a response
+
+  const handleNextToken = async () => {
+    if (!prompt) {
+      alert("Please enter a prompt!");
+      return;
+    }
+    try {
+      const response = await fetch("http://127.0.0.1:5000/generate_prob", {
+        method: "Post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: prompt }),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `HTTP error! status: ${response.status} statusText: ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      setDictResult(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setDictResult("Could not get data");
+    }
+  };
+  const [prompt, setPrompt] = useState("");
+
   const [result, setResult] = useState(
     "The model's output will appear here..."
   );
-  // State to track if the model is currently generating a response
-  const [isLoading, setIsLoading] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
   const handleGenerate = async () => {
     if (!prompt) {
       alert("Please enter a prompt!");
@@ -25,7 +56,7 @@ export default function Home() {
 
     try {
       // The API call to your Python backend remains the same
-      const response = await fetch("http://127.0.0.1:5000/generate_prob", {
+      const response = await fetch("http://127.0.0.1:5000/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,8 +85,8 @@ export default function Home() {
       <div className={styles.container}>
         <h1>Demystifying Language Models</h1>
         <p>
-          Enter the start of a story or sentence to see what the model generates
-          next.
+          Enter the start of a story or sentence to generate a completion to the
+          text. next.
         </p>
 
         <textarea
@@ -76,6 +107,12 @@ export default function Home() {
 
         <h3>Generated Output:</h3>
         <div className={styles.resultBox}>{result}</div>
+        <div className={styles.container}>
+          <button onClick={handleNextToken} className={styles.button}></button>
+          <p>
+            Data from backend: {dictResult.probabilities}, {dictResult.tokens}
+          </p>
+        </div>
       </div>
     </main>
   );
