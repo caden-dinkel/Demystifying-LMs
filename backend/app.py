@@ -6,7 +6,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api import get_token_probs
+from api import lm_apis
 
 app = FastAPI()
 
@@ -23,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(get_token_probs.router)
+app.include_router(lm_apis.router)
 
 
 

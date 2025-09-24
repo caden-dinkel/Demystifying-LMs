@@ -1,13 +1,15 @@
+#This File should be unneeded now. 
+
+
 # Import necessary libraries
 from flask import Blueprint, Flask, request, jsonify
 from flask_cors import CORS
 from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
+
+
 import torch
 import torch.nn.functional as F
 
-from fastapi import APIRouter, HTTPException
-
-router = APIRouter()
 generate_token_prob_bp = Blueprint('generate_token_prob', __name__)
 
 
@@ -19,10 +21,15 @@ print(f"loading model...")
 model = GPT2LMHeadModel.from_pretrained('gpt2')
 print(f"model loaded.")
 
+print("Loading GPT-2 model...")
+generator = pipeline('text-generation', model='gpt2')
+print("Model loaded successfully!")
 
-@router.post("get_probs")
-async def get_probs(request_data: dict):
-    prompt_text = request_data.get('prompt') # Safely get the prompt
+
+@generate_token_prob_bp.route('/generate_prob', methods=['POST'])
+def generate_prob():
+    data = request.get_json()
+    prompt_text = data.get('prompt', '') # Safely get the prompt
     encoded_input = tokenizer(prompt_text, return_tensors='pt')
     try: #Generate top 5 mostly likely next tokens and their probability
         output = model(**encoded_input)

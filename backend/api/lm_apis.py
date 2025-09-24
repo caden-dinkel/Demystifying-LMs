@@ -2,11 +2,12 @@
 
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
 import torch
 
-class LMPrompt(BaseModel):
+class LMInOut(BaseModel):
     prompt: str
+
 
     #selected_LM: str
 
@@ -28,9 +29,12 @@ print(f"loading model...")
 model = GPT2LMHeadModel.from_pretrained('gpt2')
 print(f"model loaded.")
 
+print("Loading GPT-2 model...")
+generator = pipeline('text-generation', model='gpt2')
+print("Model loaded successfully!")
 
 @router.post("/token_probs")
-async def token_probs(prompt: LMPrompt):
+async def token_probs(prompt: LMInOut):
     encoded_prompt = tokenizer(prompt.prompt, return_tensors='pt')
     try: #Generate top 5 mostly likely next tokens and their probability
 
@@ -53,3 +57,13 @@ async def token_probs(prompt: LMPrompt):
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="Issue with Calling LM")
 
+@router.post("/generate_text")
+async def generate_text(prompt: LMInOut):
+    try:
+        output = generator(prompt.prompt, max_length=50, num_return_sequences=1)
+        generated_text = output[0]['generated_text']
+        resonse_data = LMInOut(prompt=generated_text)
+        return resonse_data
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="Issue with Calling LM")

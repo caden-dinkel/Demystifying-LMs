@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@tailwind base;
 body {
   color: #ededed; /* Light gray text*/
   background-color: #457b9d; /* Fallback color for older browsers */
