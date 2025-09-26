@@ -1,12 +1,13 @@
 // Add this line at the very top. It tells Next.js to run this code in the browser.
 "use client";
 
+import { Button } from "../components/ui/button";
 import React, { useState } from "react";
 import styles from "./page.module.css"; // We'll use this for styling
 
-import { TokenProb } from "@/lib/types";
-import { getTokenProbabilities } from "@/lib/api/getTokenProbs";
-import { getGeneratedText } from "@/lib/api/getGeneratedText";
+import { TokenProb } from "@/api/types";
+import { getTokenProbabilities } from "@/api/getTokenProbs";
+import { getGeneratedText } from "@/api/getGeneratedText";
 
 export default function Home() {
   // State to hold the user's input prompt
