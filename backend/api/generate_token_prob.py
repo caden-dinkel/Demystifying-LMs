@@ -15,6 +15,10 @@ print("Loading model...")
 model = GPT2LMHeadModel.from_pretrained('gpt2')
 print("Model loaded.")
 
+print("Loading GPT-2 model...")
+generator = pipeline('text-generation', model='gpt2')
+print("Model loaded successfully!")
+
 
 @generate_token_prob_bp.route('/generate_prob', methods=['POST'])
 def generate_prob():
