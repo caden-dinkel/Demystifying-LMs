@@ -1,3 +1,5 @@
+#This file should be depreciated
+
 # api/generate_text.py
 from flask import Blueprint, request, jsonify
 from transformers import pipeline

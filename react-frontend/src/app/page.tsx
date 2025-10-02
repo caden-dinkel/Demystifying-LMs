@@ -1,14 +1,20 @@
 // Add this line at the very top. It tells Next.js to run this code in the browser.
 "use client";
 
+import { Button } from "../components/button";
 import React, { useState } from "react";
 import styles from "./page.module.css"; // We'll use this for styling
+
+import { TokenProb } from "@/api/types";
+import { getTokenProbabilities } from "@/api/getTokenProbs";
+import { getGeneratedText } from "@/api/getGeneratedText";
+import { SearchTree } from "@/components/searchTree";
 
 export default function Home() {
   // State to hold the user's input prompt
   // State to hold the generated text from the model
 
-  const [dictResult, setDictResult] = useState({});
+  const [tokensProbs, setTokensProbs] = useState<TokenProb | null>(null);
   // State to track if the model is currently generating a response
 
   const handleNextToken = async () => {
@@ -17,34 +23,25 @@ export default function Home() {
       return;
     }
     try {
-      const response = await fetch("http://127.0.0.1:5000/generate_prob", {
-        method: "Post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: prompt }),
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `HTTP error! status: ${response.status} statusText: ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-      setDictResult(data);
+      const data = await getTokenProbabilities(prompt);
+      console.log(data);
+      setTokensProbs(data);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setDictResult("Could not get data");
     }
   };
+
   const [prompt, setPrompt] = useState("");
 
   const [result, setResult] = useState(
     "The model's output will appear here..."
   );
 
+  const [readyForTree, setReadyForTree] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
+
+  //Handles calls to generate_text
   const handleGenerate = async () => {
     if (!prompt) {
       alert("Please enter a prompt!");
@@ -56,20 +53,9 @@ export default function Home() {
 
     try {
       // The API call to your Python backend remains the same
-      const response = await fetch("http://127.0.0.1:5000/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: prompt }),
-      });
+      const data = await getGeneratedText(prompt);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setResult(data.generated_text);
+      setResult(data.prompt);
     } catch (error) {
       console.error("Error fetching data:", error);
       setResult(
@@ -107,11 +93,21 @@ export default function Home() {
 
         <h3>Generated Output:</h3>
         <div className={styles.resultBox}>{result}</div>
+
         <div className={styles.container}>
           <button onClick={handleNextToken} className={styles.button}></button>
           <p>
-            Data from backend: {dictResult.probabilities}, {dictResult.tokens}
+            Data from backend: {tokensProbs?.tokens}{" "}
+            {tokensProbs?.probabilities}
           </p>
+        </div>
+        <div>
+          <div>
+            <Button variant="default" onClick={() => setReadyForTree(true)}>
+              Start Search Tree
+            </Button>
+            {readyForTree && <SearchTree initialPrompt={prompt} />}
+          </div>
         </div>
       </div>
     </main>
