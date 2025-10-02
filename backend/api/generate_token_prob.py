@@ -1,7 +1,12 @@
+#This File should be unneeded now. 
+
+
 # Import necessary libraries
 from flask import Blueprint, Flask, request, jsonify
 from flask_cors import CORS
 from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
+
+
 import torch
 import torch.nn.functional as F
 
@@ -15,6 +20,10 @@ print(f"tokenizer loaded.")
 print(f"loading model...")
 model = GPT2LMHeadModel.from_pretrained('gpt2')
 print(f"model loaded.")
+
+print("Loading GPT-2 model...")
+generator = pipeline('text-generation', model='gpt2')
+print("Model loaded successfully!")
 
 
 @generate_token_prob_bp.route('/generate_prob', methods=['POST'])
