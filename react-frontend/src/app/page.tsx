@@ -1,13 +1,14 @@
 // Add this line at the very top. It tells Next.js to run this code in the browser.
 "use client";
 
-import { Button } from "../components/ui/button";
+import { Button } from "../components/button";
 import React, { useState } from "react";
 import styles from "./page.module.css"; // We'll use this for styling
 
 import { TokenProb } from "@/api/types";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { getGeneratedText } from "@/api/getGeneratedText";
+import { SearchTree } from "@/components/searchTree";
 
 export default function Home() {
   // State to hold the user's input prompt
@@ -23,6 +24,7 @@ export default function Home() {
     }
     try {
       const data = await getTokenProbabilities(prompt);
+      console.log(data);
       setTokensProbs(data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -34,6 +36,8 @@ export default function Home() {
   const [result, setResult] = useState(
     "The model's output will appear here..."
   );
+
+  const [readyForTree, setReadyForTree] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -96,6 +100,14 @@ export default function Home() {
             Data from backend: {tokensProbs?.tokens}{" "}
             {tokensProbs?.probabilities}
           </p>
+        </div>
+        <div>
+          <div>
+            <Button variant="default" onClick={() => setReadyForTree(true)}>
+              Start Search Tree
+            </Button>
+            {readyForTree && <SearchTree initialPrompt={prompt} />}
+          </div>
         </div>
       </div>
     </main>

@@ -8,7 +8,6 @@ import torch
 class LMInOut(BaseModel):
     prompt: str
 
-
     #selected_LM: str
 
 class LMProbSpread(BaseModel):
@@ -47,9 +46,9 @@ async def token_probs(prompt: LMInOut):
 
         #Select top five probs
         top_5_probs, top_5_indices = torch.topk(probabilities, 5)
-        decoded_tokens = [tokenizer.decode(index) for index in top_5_indices.tolist()]
+        decoded_tokens = [tokenizer.decode(index) for index in top_5_indices.tolist()[0]]
         probs_list = [round(prob, 3) for prob in top_5_probs.tolist()[0]]
-
+        print(f"{decoded_tokens}")
         #Return from fastAPI as a Pydantic Model
         response_data = LMProbSpread(tokens=decoded_tokens, probabilities=probs_list)
         return (response_data)
