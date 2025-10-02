@@ -12,7 +12,6 @@ print("Model loaded successfully!")
 
 @generate_text_bp.route('/generate', methods=['POST'])
 def generate():
-    # Your existing API logic goes here
     data = request.get_json()
     prompt_text = data.get('prompt', '')
 
