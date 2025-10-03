@@ -10,10 +10,6 @@ export const getTokenProbabilities = async (
       `${API_BASE_URL}lm/token_probs`,
       { prompt }
     );
-    const returnTokenProbs: TokenProb = {
-      tokens: response.data.tokens,
-      probabilities: response.data.probabilities,
-    };
     return response.data;
   } catch (error) {
     console.error("Error fetching LM prediction:", error);
