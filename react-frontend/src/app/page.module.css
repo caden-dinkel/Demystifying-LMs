@@ -54,3 +54,54 @@
   color: #ededed; /* Light grey text */
   border: 1px solid #555555; /* Matching border */
 }
+
+.section {
+  width: 100%;
+  padding: 2rem;
+  margin-top: 2rem;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tokenizerOutput {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.token {
+  background-color: #4a4e69;
+  color: #f2e9e4;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.probabilities ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.probabilities li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.tokenPrediction {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.probability {
+  color: #c9ada7;
+}

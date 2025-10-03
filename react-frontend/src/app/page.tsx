@@ -3,20 +3,46 @@
 
 import { Button } from "../components/button";
 import React, { useState } from "react";
-import styles from "./page.module.css"; // We'll use this for styling
-
-import { TokenProb } from "@/api/types";
+import styles from "./page.module.css";
+import { Token, TokenProb } from "@/api/types";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { getGeneratedText } from "@/api/getGeneratedText";
 import { SearchTree } from "@/components/searchTree";
+import { postTokenizeText } from "@/api/postTokenizeText";
+
+// --- TypeScript Interfaces ---
+
+// Shape of the data to use for rendering
 
 export default function Home() {
   // State to hold the user's input prompt
   // State to hold the generated text from the model
+  const [tokenizedOutput, setTokenizedOutput] = useState<Token[]>();
 
   const [tokensProbs, setTokensProbs] = useState<TokenProb | null>(null);
   // State to track if the model is currently generating a response
 
+  const [prompt, setPrompt] = useState("");
+
+  const [result, setResult] = useState(
+    "The model's output will appear here..."
+  );
+
+  const handleTokenize = async () => {
+    if (!prompt) {
+      alert("Please enter a prompt!");
+      return;
+    }
+    try {
+      const data = await postTokenizeText(prompt);
+      console.log(data);
+      setTokenizedOutput(data);
+    } catch (error) {
+      console.error("Error Tokenizing Text:", error);
+    }
+  };
+
+  //Handles calls to token_probs
   const handleNextToken = async () => {
     if (!prompt) {
       alert("Please enter a prompt!");
@@ -30,12 +56,6 @@ export default function Home() {
       console.error("Error fetching data:", error);
     }
   };
-
-  const [prompt, setPrompt] = useState("");
-
-  const [result, setResult] = useState(
-    "The model's output will appear here..."
-  );
 
   const [readyForTree, setReadyForTree] = useState(false);
 
@@ -72,7 +92,7 @@ export default function Home() {
         <h1>Demystifying Language Models</h1>
         <p>
           Enter the start of a story or sentence to generate a completion to the
-          text. next.
+          text.
         </p>
 
         <textarea
@@ -107,6 +127,23 @@ export default function Home() {
               Start Search Tree
             </Button>
             {readyForTree && <SearchTree initialPrompt={prompt} />}
+          </div>
+          <div className={styles.section}>
+            <h2>2. Visual Tokenizer</h2>
+            <p>
+              Enter any text to see how the GPT-2 model breaks it down into
+              tokens.
+            </p>
+            <Button onClick={handleTokenize} className={styles.button} />
+            {tokenizedOutput && (
+              <div className={styles.tokenizerOutput}>
+                {tokenizedOutput.map((token) => (
+                  <span key={token.id} className={styles.token}>
+                    {token.value.replace(/\u0120/g, " ")}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

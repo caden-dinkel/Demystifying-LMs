@@ -1,22 +1,23 @@
-#Replacement API for generate_token_prob.py
-
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
-from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
+from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel, AutoTokenizer 
 import torch
 
 class LMInOut(BaseModel):
     prompt: str
 
-    #selected_LM: str
 
 class LMProbSpread(BaseModel):
     tokens: list[str]
     probabilities: list[float]
 
+class Token(BaseModel):
+    value: str
+    id: int
+
 router = APIRouter(
     prefix="/lm",
-    #tags=["LM APIs"]
+    tags=["LM APIs"]
 )
 
 #Would like to move this section at some point and include the selected LM in the request
@@ -66,3 +67,16 @@ async def generate_text(prompt: LMInOut):
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="Issue with Calling LM")
+
+@router.post("/tokenize_text_gpt")
+async def tokenize_text(prompt: LMInOut):
+    try:
+        token_ids = tokenizer.encode(prompt.prompt)
+        tokens = tokenizer.convert_ids_to_tokens(token_ids)
+        result = [Token(value=val, id=tid) for val, tid in zip(tokens, token_ids)]
+        print(f"{result}")
+        return result
+    except Exception as e:
+        print(f"An error occurred during tokenization: {e}")
+        raise HTTPException(status_code=500, detail="Error Tokenizing input text.")
+    
