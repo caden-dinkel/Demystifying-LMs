@@ -1,5 +1,5 @@
 @tailwind base;
-@tailwind components;
+@tailwind componenets;
 @tailwind utilities;
 
 body {
@@ -9,7 +9,7 @@ body {
   background-repeat: no-repeat;
   min-height: 100vh; /* Ensures the gradient covers the full page height */
 }
-
+/* ---break---*/
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -66,9 +66,12 @@ body {
     --chart-5: 340 75% 55%;
   }
 }
-
+/* ---break---*/
 @layer base {
   * {
     @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
