@@ -7,8 +7,104 @@
   min-height: 100vh;
 }
 
+.navbar {
+  background-color: #282c34;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- Title/Logo Style --- */
+.nav-title {
+  color: #61dafb;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* --- Navigation Links (Desktop) --- */
+.nav-links {
+  list-style: none;
+  display: flex; /* Horizontal on desktop */
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-links li a {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem;
+  display: block;
+}
+
+.nav-links li a:hover {
+  color: #61dafb;
+}
+
+/* --- Hamburger Button (Hidden on Desktop) --- */
+.hamburger {
+  display: none; /* Hide by default on large screens */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+.bar {
+  display: block;
+  width: 25px;
+  height: 3px;
+  margin: 5px 0;
+  background-color: white;
+  transition: all 0.3s ease-in-out;
+}
+
+/* ------------------------------------------- */
+/* --- 📱 Media Query for Mobile (max-width: 768px) --- */
+/* ------------------------------------------- */
+
+@media (max-width: 768px) {
+  /* Show the hamburger icon */
+  .hamburger {
+    display: block;
+  }
+
+  /* Hide links by default and position for mobile menu */
+  .nav-links {
+    display: flex;
+    flex-direction: column; /* Stack links vertically */
+    position: absolute;
+    top: 65px; /* Position below the navbar */
+    left: 0;
+    width: 100%;
+    height: 0; /* Initially hidden */
+    background-color: #282c34;
+    overflow: hidden;
+  }
+
+  /* When the menu is open, give it height */
+  .nav-links.open {
+    height: auto;
+    padding: 1rem 0;
+  }
+
+  /* Style individual links for better tapping */
+  .nav-links li {
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+
+  .nav-links li a {
+    padding: 10px;
+  }
+}
+
 .container {
-  max-width: 600px;
+  max-width: 800px;
   width: 100%;
   text-align: center;
 }
@@ -53,4 +149,55 @@
   background-color: #333333; /* Dark grey background */
   color: #ededed; /* Light grey text */
   border: 1px solid #555555; /* Matching border */
+}
+
+.section {
+  width: 100%;
+  padding: 2rem;
+  margin-top: 2rem;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tokenizerOutput {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.token {
+  background-color: #4a4e69;
+  color: #f2e9e4;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.probabilities ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.probabilities li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.tokenPrediction {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.probability {
+  color: #c9ada7;
 }

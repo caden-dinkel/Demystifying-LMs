@@ -1,14 +1,14 @@
-// react-frontend/src/app/page.tsx
 "use client";
 
-//This is to change gits
 import Navbar from "@/components/navBar";
 import React, { useState } from "react";
+import { Tokenizer } from "@/components/tokenizeText";
 
-export default function Home() {
+export default function TokenizeText() {
   return (
     <div>
       <Navbar />
+      <Tokenizer />
     </div>
   );
 }

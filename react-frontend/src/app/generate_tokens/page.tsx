@@ -1,14 +1,15 @@
 // react-frontend/src/app/page.tsx
 "use client";
 
-//This is to change gits
 import Navbar from "@/components/navBar";
 import React, { useState } from "react";
+import { StepTokenGen } from "@/components/stepGeneration";
 
-export default function Home() {
+export default function GenerateTokens() {
   return (
     <div>
       <Navbar />
+      <StepTokenGen />
     </div>
   );
 }

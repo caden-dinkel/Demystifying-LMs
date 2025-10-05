@@ -8,3 +8,8 @@ export interface TokenProb {
 export interface LMOutput {
   prompt: string;
 }
+
+export interface Token {
+  value: string;
+  id: number;
+}

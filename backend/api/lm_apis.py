@@ -1,22 +1,23 @@
-#Replacement API for generate_token_prob.py
-
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
-from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
+from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel, AutoTokenizer 
 import torch
 
 class LMInOut(BaseModel):
     prompt: str
 
-    #selected_LM: str
 
 class LMProbSpread(BaseModel):
     tokens: list[str]
     probabilities: list[float]
 
+class Token(BaseModel):
+    value: str
+    id: int
+
 router = APIRouter(
     prefix="/lm",
-    #tags=["LM APIs"]
+    tags=["LM APIs"]
 )
 
 #Would like to move this section at some point and include the selected LM in the request
@@ -35,20 +36,23 @@ print("Model loaded successfully!")
 @router.post("/token_probs")
 async def token_probs(prompt: LMInOut):
     encoded_prompt = tokenizer(prompt.prompt, return_tensors='pt')
+    input_ids = encoded_prompt['input_ids']
+    print(f"{input_ids}")
     try: #Generate top 5 mostly likely next tokens and their probability
 
         #This outputs the final hidden state I believe
-        output = model(**encoded_prompt)
+        output = model(input_ids, max_new_tokens=1, output_scores=True, temperature=0.5, repetition_penalty=1.2)
         logits = output.logits
 
         #Softmax on output logits produces the probability spread on entire vocab
         probabilities = torch.nn.functional.softmax(logits[:, -1, :], dim=-1)
 
         #Select top five probs
-        top_5_probs, top_5_indices = torch.topk(probabilities, 5)
-        decoded_tokens = [tokenizer.decode(index) for index in top_5_indices.tolist()[0]]
-        probs_list = [round(prob, 3) for prob in top_5_probs.tolist()[0]]
+        top_k_probs, top_k_indices = torch.topk(probabilities, 10)
+        decoded_tokens = [tokenizer.decode(index) for index in top_k_indices.tolist()[0]]
+        probs_list = [round(prob, 3) for prob in top_k_probs.tolist()[0]]
         print(f"{decoded_tokens}")
+
         #Return from fastAPI as a Pydantic Model
         response_data = LMProbSpread(tokens=decoded_tokens, probabilities=probs_list)
         return (response_data)
@@ -66,3 +70,16 @@ async def generate_text(prompt: LMInOut):
     except Exception as e:
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail="Issue with Calling LM")
+
+@router.post("/tokenize_text_gpt")
+async def tokenize_text(prompt: LMInOut):
+    try:
+        token_ids = tokenizer.encode(prompt.prompt)
+        tokens = tokenizer.convert_ids_to_tokens(token_ids)
+        result = [Token(value=val, id=tid) for val, tid in zip(tokens, token_ids)]
+        print(f"{result}")
+        return result
+    except Exception as e:
+        print(f"An error occurred during tokenization: {e}")
+        raise HTTPException(status_code=500, detail="Error Tokenizing input text.")
+    
