@@ -1,6 +1,7 @@
 import { Button, ButtonProps } from "@/components/button";
 
-export interface TokenChipProps extends Omit<ButtonProps, "onClick"> {
+export interface TokenChipProps extends ButtonProps {
+  id: string;
   token: string;
   prob: number;
 
@@ -10,14 +11,15 @@ export interface TokenChipProps extends Omit<ButtonProps, "onClick"> {
 }
 
 export const TokenChip = ({
+  id,
   token,
   prob,
   onSelection,
   ...props
 }: TokenChipProps) => {
   return (
-    <Button onClick={() => onSelection(token)} {...props}>
-      {token}: {prob}
+    <Button onClick={() => onSelection(id)} {...props}>
+      {token}: {prob * 100}%
     </Button>
   );
 };

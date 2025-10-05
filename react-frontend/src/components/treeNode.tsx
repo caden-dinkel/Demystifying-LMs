@@ -9,3 +9,9 @@ export interface TreeNode {
   childrenNodeIds: string[];
   isSelected: boolean;
 }
+
+export interface TokenData {
+  id: string;
+  token: string;
+  prob: number;
+}
