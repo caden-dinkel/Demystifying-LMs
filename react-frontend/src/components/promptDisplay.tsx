@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./card";
-import { TokenChip } from "@/components/tokenChip";
-import { TokenData } from "@/components/treeNode";
+import { TokenData } from "@/api/types";
 import { TokenMap } from "./tokenMap";
 
 export interface PromptDisplayProps {
