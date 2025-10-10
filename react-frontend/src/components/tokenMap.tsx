@@ -1,5 +1,5 @@
 import { TokenChip } from "@/components/tokenChip";
-import { TokenData } from "./treeNode";
+import { TokenData } from "@/api/types";
 export interface TokenMapProps extends React.HTMLAttributes<HTMLDivElement> {
   tokenData: TokenData[];
   onSelection: (selectedToken: string) => void;

@@ -1,9 +1,9 @@
-import { TreeNode } from "@/components/treeNode";
+import { TreeNode } from "@/api/types";
 import { useEffect, useState, useRef } from "react";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { PromptDisplay } from "@/components/promptDisplay";
 import { TokenMap } from "@/components/tokenMap";
-import { TokenData } from "@/components/treeNode";
+import { TokenData } from "@/api/types";
 
 export interface SearchTreeProps {
   initialPrompt: string;
