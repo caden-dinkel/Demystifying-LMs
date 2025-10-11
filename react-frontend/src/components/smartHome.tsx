@@ -1,4 +1,4 @@
-import { Room, Person } from "@/api/types";
+import { Room, Person } from "@/lib/types";
 import { DrawRoom } from "./room";
 import { useState } from "react";
 export interface SmartHomeProps {

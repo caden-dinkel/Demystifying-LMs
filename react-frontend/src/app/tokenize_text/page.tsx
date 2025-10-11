@@ -1,14 +1,20 @@
 "use client";
 
 import Navbar from "@/components/navBar";
-import React, { useState } from "react";
+import React from "react";
 import { Tokenizer } from "@/components/tokenizeText";
+import styles from "@/styles/main-layout.module.css";
 
 export default function TokenizeText() {
   return (
-    <div>
+    <>
+      {/* 1. Navbar (Navigation, outside the main content) */}
       <Navbar />
-      <Tokenizer />
-    </div>
+
+      {/* 2. Main Content (The unique part of this page) */}
+      <main className={styles.baseMain}>
+        <Tokenizer />
+      </main>
+    </>
   );
 }

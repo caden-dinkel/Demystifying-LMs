@@ -2,13 +2,6 @@
 @tailwind componenets;
 @tailwind utilities;
 
-body {
-  color: #ededed; /* Light gray text*/
-  background-color: #457b9d; /* Fallback color for older browsers */
-  background-image: linear-gradient(to bottom, #673ab7, #0a0612);
-  background-repeat: no-repeat;
-  min-height: 100vh; /* Ensures the gradient covers the full page height */
-}
 /* ---break---*/
 @layer base {
   :root {

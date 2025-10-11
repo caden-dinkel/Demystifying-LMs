@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import navbar from "@/app/page.module.css";
+import navbar from "@/styles/navBar.module.css";
 import { ActiveLink } from "./activeLink";
 
 const NavLinks = [

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Token } from "@/api/types";
+import { Token } from "@/lib/types";
 import { postTokenizeText } from "@/api/postTokenizeText";
-import styles from "@/app/page.module.css";
+import styles from "@/styles/page.module.css";
 import { Button } from "./button";
+import { TextareaInput } from "./textBox";
 
 export const Tokenizer = () => {
   const [tokenizedOutput, setTokenizedOutput] = useState<Token[]>();
@@ -21,18 +22,12 @@ export const Tokenizer = () => {
     }
   };
   return (
-    <div className={styles.section}>
+    <div>
       <h2>2. Visual Tokenizer</h2>
       <p>
         Enter any text to see how the GPT-2 model breaks it down into tokens.
       </p>
-      <textarea
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        placeholder="Once upon a time..."
-        rows={4}
-        className={styles.textarea}
-      />
+      <TextareaInput value={prompt} onTextChange={(e) => setPrompt(e)} />
 
       <Button onClick={handleTokenize} className={styles.button} />
       {tokenizedOutput && (
