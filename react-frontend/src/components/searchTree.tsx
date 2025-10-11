@@ -1,9 +1,9 @@
-import { TreeNode } from "@/api/types";
+import { TreeNode } from "@/lib/types";
 import { useEffect, useState, useRef } from "react";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { PromptDisplay } from "@/components/promptDisplay";
 import { TokenMap } from "@/components/tokenMap";
-import { TokenData } from "@/api/types";
+import { TokenData } from "@/lib/types";
 
 export interface SearchTreeProps {
   initialPrompt: string;
@@ -77,7 +77,7 @@ export const SearchTree = ({ initialPrompt }: SearchTreeProps) => {
     };
 
     fetchInitialTokens();
-  }, []); // Rerun only when initialPrompt changes
+  }, [initialPrompt, searchTree.size]); // Rerun only when initialPrompt changes
 
   // ... rest of the component
 

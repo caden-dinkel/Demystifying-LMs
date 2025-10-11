@@ -1,4 +1,4 @@
-import { Room } from "@/api/types";
+import { Room } from "@/lib/types";
 
 interface RoomProps {
   room: Room;

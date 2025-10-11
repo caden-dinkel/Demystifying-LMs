@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "./config";
-import { Token } from "./types";
+import { Token } from "../lib/types";
 
 //If there are bugs, you forgot the backend loser
 export const postTokenizeText = async (prompt: string): Promise<Token[]> => {

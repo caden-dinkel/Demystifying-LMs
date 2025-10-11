@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./card";
-import { TokenData } from "@/api/types";
+import { TokenData } from "@/lib/types";
 import { TokenMap } from "./tokenMap";
 
 export interface PromptDisplayProps {

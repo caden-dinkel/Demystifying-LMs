@@ -2,7 +2,7 @@
 
 import { Url } from "next/dist/shared/lib/router/router";
 import Link from "next/link";
-import navbar from "@/app/page.module.css";
+import navbar from "@/styles/navBar.module.css";
 import { usePathname } from "next/navigation";
 
 interface ActiveLinkProps {
@@ -15,8 +15,8 @@ export function ActiveLink(linkProps: ActiveLinkProps) {
   const isActive = pathname === linkProps.href;
 
   return (
-    <Link href={linkProps.href}>
-      <span className={navbar.navLink}>{linkProps.children}</span>
+    <Link href={linkProps.href} className={navbar.navLink}>
+      {linkProps.children}
     </Link>
   );
 }

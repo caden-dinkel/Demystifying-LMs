@@ -1,5 +1,5 @@
 import axios from "axios";
-import { TokenProb } from "./types";
+import { TokenProb } from "../lib/types";
 import { API_BASE_URL } from "./config";
 
 export const getTokenProbabilities = async (

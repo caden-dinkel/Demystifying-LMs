@@ -3,12 +3,13 @@
 
 //This is to change gits
 import Navbar from "@/components/navBar";
-import React, { useState } from "react";
+import React from "react";
+import styles from "@/styles/main-layout.module.css";
 
 export default function Home() {
   return (
-    <div>
+    <>
       <Navbar />
-    </div>
+    </>
   );
 }

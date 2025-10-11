@@ -2,7 +2,8 @@
 "use client";
 import { useState } from "react";
 import { getGeneratedText } from "@/api/getGeneratedText";
-import styles from "@/app/page.module.css";
+import styles from "@/styles/page.module.css";
+import { TextareaInput } from "./textBox";
 
 export const TextGenerator = () => {
   const [prompt, setPrompt] = useState("");
@@ -40,14 +41,7 @@ export const TextGenerator = () => {
         Enter the start of a story or sentence to generate a completion to the
         text.
       </p>
-
-      <textarea
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        placeholder="Once upon a time..."
-        rows={4}
-        className={styles.textarea}
-      />
+      <TextareaInput value={prompt} onTextChange={(e) => setPrompt(e)} />
 
       <button
         onClick={handleGenerate}
