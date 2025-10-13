@@ -15,7 +15,10 @@ export function ActiveLink(linkProps: ActiveLinkProps) {
   const isActive = pathname === linkProps.href;
 
   return (
-    <Link href={linkProps.href} className={navbar.navLink}>
+    <Link
+      href={linkProps.href}
+      className={isActive ? navbar.activeLink : navbar.navLink}
+    >
       {linkProps.children}
     </Link>
   );
