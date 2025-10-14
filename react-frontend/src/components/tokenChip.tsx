@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from "@/components/button";
-import button from "@/styles/tokens.module.css";
+import styles from "@/styles/tokens.module.css";
 import { ProbBar } from "./probBar";
 
 export interface TokenChipProps extends ButtonProps {
@@ -17,15 +17,15 @@ export const TokenChip = ({
   ...props
 }: TokenChipProps) => {
   return (
-    <div className={button.tokenChipWrapper}>
+    <div className={styles.tokenChipWrapper}>
       {/* 1. The Interactive Button */}
       <Button
-        className={button.tokenChipButton}
+        className={styles.tokenChipButton}
         onClick={() => onSelection(id)}
         {...props}
       >
-        <span className={button.tokenText}>{token}</span>
-        <span className={button.probText}>{Math.round(prob * 1000) / 10}%</span>
+        <span className={styles.tokenText}>{token}</span>
+        <span className={styles.probText}>{Math.round(prob * 1000) / 10}%</span>
       </Button>
       <ProbBar prob={prob}></ProbBar>
     </div>

@@ -58,12 +58,19 @@
   width: 100px;
   /* Match the button's height */
   height: 2.5rem;
-  color: red;
-  background-color: red;
-  /* Styling for the gray background */
-  border: 1px solid black;
+
+  /* Apply muted background color for the empty part of the bar */
+  @apply bg-muted;
+
+  /* Use the border color for a subtle outline */
+  @apply border border-border;
+
+  /* Ensure clean edges */
+  @apply rounded-md;
+
   /* Setup for the fill bar */
   position: relative;
+  overflow: hidden; /* Ensures the fill bar respects the rounded corners */
 }
 
 /* --- 4. Probability Bar Fill (The Colored Portion) --- */
@@ -74,10 +81,28 @@
   left: 0;
   /* Takes up 100% of the height */
   height: 100%;
-  background-color: red;
-  /* Choose a color for the fill */
-  color: green;
+
+  /* Use the primary color for the fill */
+  /* This color is typically dark in light mode, and light in dark mode */
+  @apply bg-primary;
 
   /* Smooth transition for when the probability updates */
   transition: width 0.3s ease-out;
+}
+
+.promptToken {
+  /* Use Tailwind classes for colors, borders, and interaction */
+  @apply bg-muted text-foreground border border-input rounded-sm;
+  @apply hover:bg-muted/50 transition-colors; /* Added hover effect for interactivity */
+
+  /* Standard CSS properties for size and layout */
+  padding: 0.25rem 0.5rem; /* Slightly larger padding (4px 8px) for readability */
+  border-radius: 0.25rem; /* A standard small radius (4px) */
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.promptTokenText {
+  @apply font-normal text-sm;
+  white-space: nowrap; /* Ensures the token text stays on one line */
 }

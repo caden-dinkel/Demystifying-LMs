@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardTitle, CardHeader } from "./card";
 import { ThemeSwitch } from "./themeSwitch";
+import { FunctionSwitch } from "./functionSwitch";
 import settings from "@/styles/settings.module.css";
 import { Button } from "@/components/button";
 import { Settings as SettingsIcon } from "lucide-react";
 import button from "@/styles/button.module.css";
+import { LMSwitch } from "./lmSwitch";
 
 export const SettingsCard = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -53,6 +55,12 @@ export const SettingsCard = () => {
           <CardContent className="p-2">
             <h4 className={settings.sectionLabel}>Appearance</h4>
             <ThemeSwitch></ThemeSwitch>
+            <h4 className={settings.sectionLabel}>
+              Language Model Functionality
+            </h4>
+            <FunctionSwitch></FunctionSwitch>
+            <h4 className={settings.sectionLabel}>Language Model</h4>
+            <LMSwitch></LMSwitch>
           </CardContent>
         </Card>
       )}
