@@ -1,12 +1,11 @@
 import { Button, ButtonProps } from "@/components/button";
+import styles from "@/styles/tokens.module.css";
+import { ProbBar } from "./probBar";
 
 export interface TokenChipProps extends ButtonProps {
   id: string;
   token: string;
   prob: number;
-
-  //This will check if that next branch is already stored on client
-  //If not, will send request to backend for next prob spread
   onSelection: (selectedToken: string) => void;
 }
 
@@ -18,8 +17,17 @@ export const TokenChip = ({
   ...props
 }: TokenChipProps) => {
   return (
-    <Button onClick={() => onSelection(id)} {...props}>
-      {token}: {prob * 100}%
-    </Button>
+    <div className={styles.tokenChipWrapper}>
+      {/* 1. The Interactive Button */}
+      <Button
+        className={styles.tokenChipButton}
+        onClick={() => onSelection(id)}
+        {...props}
+      >
+        <span className={styles.tokenText}>{token}</span>
+        <span className={styles.probText}>{Math.round(prob * 1000) / 10}%</span>
+      </Button>
+      <ProbBar prob={prob}></ProbBar>
+    </div>
   );
 };

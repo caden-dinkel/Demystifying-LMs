@@ -1,0 +1,108 @@
+.tokenizerOutput {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.token {
+  background-color: #4a4e69;
+  color: #f2e9e4;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.tokenChipWrapper {
+  /* Flex container to place button and bar side-by-side */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Space between the button and the bar */
+}
+
+/* --- 2. The Interactive Button (Ensure fixed width for alignment) --- */
+.tokenChipButton {
+  /* Core button styles */
+  @apply bg-background text-foreground border border-input rounded-md;
+
+  /* Internal Flex Layout */
+  display: flex;
+  justify-content: space-between;
+  align-items: left;
+
+  /* Fixed width is crucial for a clean list display */
+  width: 200px;
+  padding: 0.5rem 0.75rem;
+  height: 2.5rem; /* h-10 */
+}
+
+/* Optional: Text Styling */
+.tokenText {
+  @apply font-medium;
+}
+
+.probText {
+  @apply text-muted-foreground text-sm ml-2;
+}
+
+/* =================================================== */
+/* === PROBABILITY BAR COMPONENT STYLES (ProbBar.jsx) === */
+/* =================================================== */
+
+/* --- 3. Probability Bar Container (The Gray Tone) --- */
+.probBarContainer {
+  /* Fixed total width for the bar (adjust as needed) */
+  width: 100px;
+  /* Match the button's height */
+  height: 2.5rem;
+
+  /* Apply muted background color for the empty part of the bar */
+  @apply bg-muted;
+
+  /* Use the border color for a subtle outline */
+  @apply border border-border;
+
+  /* Ensure clean edges */
+  @apply rounded-md;
+
+  /* Setup for the fill bar */
+  position: relative;
+  overflow: hidden; /* Ensures the fill bar respects the rounded corners */
+}
+
+/* --- 4. Probability Bar Fill (The Colored Portion) --- */
+.probBarFill {
+  /* Sits absolutely inside the container */
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Takes up 100% of the height */
+  height: 100%;
+
+  /* Use the primary color for the fill */
+  /* This color is typically dark in light mode, and light in dark mode */
+  @apply bg-primary;
+
+  /* Smooth transition for when the probability updates */
+  transition: width 0.3s ease-out;
+}
+
+.promptToken {
+  /* Use Tailwind classes for colors, borders, and interaction */
+  @apply bg-muted text-foreground border border-input rounded-sm;
+  @apply hover:bg-muted/50 transition-colors; /* Added hover effect for interactivity */
+
+  /* Standard CSS properties for size and layout */
+  padding: 0.25rem 0.5rem; /* Slightly larger padding (4px 8px) for readability */
+  border-radius: 0.25rem; /* A standard small radius (4px) */
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.promptTokenText {
+  @apply font-normal text-sm;
+  white-space: nowrap; /* Ensures the token text stays on one line */
+}

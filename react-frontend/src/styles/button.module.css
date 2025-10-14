@@ -1,0 +1,54 @@
+.btnPrimary {
+  /* Default appearance */
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors;
+
+  /* Colors from your globals */
+  @apply bg-primary text-primary-foreground;
+
+  /* Focus/Ring */
+  @apply ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+
+  /* Disabled state */
+  @apply disabled:pointer-events-none disabled:opacity-50;
+
+  /* Hover/Active State */
+  /* Calculate a darker shade of --primary for hover (e.g., using a darker opacity or a custom class if needed) */
+  /* We'll use a standard Tailwind hover opacity for simplicity, or assume shadcn's hover effect is built-in */
+  /* For explicit control, you might define a new variable or rely on shadcn's Button component default hover which often darkens the bg */
+
+  /* For this example, we'll use a basic opacity change on hover/active */
+  @apply hover:bg-primary/90;
+
+  /* Sizing (Default padding) */
+  padding: 0.5rem 1rem; /* py-2 px-4 */
+  height: 2.5rem; /* h-10 */
+}
+
+/* navBar.module.css */
+
+.btnGhost {
+  /* Default appearance */
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors;
+
+  /* Colors: Transparent background, foreground text */
+  @apply bg-transparent text-foreground;
+
+  /* Hover State: Uses the subtle muted background color defined in your globals for the "boxed" effect */
+  @apply hover:bg-muted hover:text-foreground;
+
+  /* Focus/Ring */
+  @apply ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+
+  /* Disabled state */
+  @apply disabled:pointer-events-none disabled:opacity-50;
+
+  /* Sizing (Default padding) */
+  padding: 0.5rem 1rem; /* py-2 px-4 */
+  height: 2.5rem; /* h-10 */
+}
+
+/* Icon-only size for the Settings button */
+.btnIcon {
+  /* Inherits all properties from .btnGhost */
+  @apply h-10 w-10 p-0; /* Square button, no padding, size h-10 w-10 */
+}

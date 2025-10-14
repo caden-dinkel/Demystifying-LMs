@@ -1,6 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "./card";
 import { TokenData } from "@/lib/types";
-import { TokenMap } from "./tokenMap";
+import styles from "@/styles/tokens.module.css";
+import { PromptToken } from "./promptToken";
+import { postTokenizeText } from "@/api/postTokenizeText";
 
 export interface PromptDisplayProps {
   currentTokens: TokenData[];
@@ -12,21 +13,21 @@ export const PromptDisplay = ({
   onNodeClick,
 }: PromptDisplayProps) => {
   console.log(currentTokens);
-  return (
-    // The main container for the left side
-    <Card className="w-1/2 min-w-[400px]">
-      {/* Optional: Title for context */}
-      <CardHeader>
-        <CardTitle>Current Search Path</CardTitle>
-      </CardHeader>
+  try {
+    const data = await postTokenizeText(currentTokens.join(" "));
+    console.log(data);
+  } catch (error) {}
 
-      {/* Container for the tokens */}
-      <CardContent className="flex flex-wrap gap-2 p-4">
-        <TokenMap
-          tokenData={currentTokens}
-          onSelection={onNodeClick}
-        ></TokenMap>
-      </CardContent>
-    </Card>
+  return (
+    <div className={styles.promptTokenContainer}>
+      {currentTokens.map((tokenData) => (
+        <PromptToken
+          key={tokenData.id}
+          id={tokenData.id}
+          token={tokenData.token}
+          onNodeClick={onNodeClick}
+        />
+      ))}
+    </div>
   );
 };

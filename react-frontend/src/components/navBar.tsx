@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import navbar from "@/styles/navBar.module.css";
 import { ActiveLink } from "./activeLink";
+
+import { SettingsCard } from "./settingsCard";
 
 const NavLinks = [
   { name: "Home", href: "/" },
@@ -10,18 +12,17 @@ const NavLinks = [
 ];
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  // Function to toggle the menu open/closed
-
   return (
     <nav className={navbar.navbar}>
-      {NavLinks.map((link) => (
-        // Use the Next.js Link component with the 'href' prop
-        <ActiveLink key={link.name} href={link.href}>
-          {link.name}
-        </ActiveLink>
-      ))}
+      <div className={navbar.navLinksContainer}>
+        {NavLinks.map((link) => (
+          // Use the Next.js Link component with the 'href' prop
+          <ActiveLink key={link.name} href={link.href}>
+            {link.name}
+          </ActiveLink>
+        ))}
+      </div>
+      <SettingsCard></SettingsCard>
     </nav>
   );
 };

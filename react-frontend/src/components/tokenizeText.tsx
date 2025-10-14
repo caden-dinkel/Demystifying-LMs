@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Token } from "@/lib/types";
 import { postTokenizeText } from "@/api/postTokenizeText";
-import styles from "@/styles/page.module.css";
+import button from "@/styles/button.module.css";
+import toks from "@/styles/tokens.module.css";
 import { Button } from "./button";
 import { TextareaInput } from "./textBox";
 
@@ -29,11 +30,13 @@ export const Tokenizer = () => {
       </p>
       <TextareaInput value={prompt} onTextChange={(e) => setPrompt(e)} />
 
-      <Button onClick={handleTokenize} className={styles.button} />
+      <Button onClick={handleTokenize} className={button.btnPrimary}>
+        Tokenize Text
+      </Button>
       {tokenizedOutput && (
-        <div className={styles.tokenizerOutput}>
+        <div className={toks.tokenizerOutput}>
           {tokenizedOutput.map((token) => (
-            <span key={token.id} className={styles.token}>
+            <span key={token.id} className={toks.token}>
               {token.value.replace(/\u0120/g, " ")}
             </span>
           ))}
