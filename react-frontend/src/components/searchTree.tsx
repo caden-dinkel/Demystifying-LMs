@@ -77,7 +77,7 @@ export const SearchTree = ({ initialPrompt }: SearchTreeProps) => {
     };
 
     fetchInitialTokens();
-  }, [initialPrompt, searchTree.size]); // Rerun only when initialPrompt changes
+  }, [initialPrompt]); // Rerun only when initialPrompt changes
 
   // ... rest of the component
 

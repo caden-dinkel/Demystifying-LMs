@@ -31,3 +31,12 @@
   font-weight: 600; /* Makes selected text bold for emphasis */
   cursor: default; /* Change cursor to indicate it's already selected */
 }
+
+.toggleGroup {
+  display: flex;
+  /* Aligns items vertically */
+  align-items: center;
+  justify-items: center;
+  /* Optional: Small gap between buttons if you DON'T want them connected */
+  /* gap: 4px; */
+}

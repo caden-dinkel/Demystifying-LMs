@@ -1,21 +1,16 @@
-"use client";
 import { Button } from "./button";
 import { SearchTree } from "./searchTree";
 import { TextareaInput } from "./textBox";
 import React, { useState, useCallback } from "react";
 import styles from "@/styles/textbox.module.css";
-// Assuming SearchTree, Button, and styles are imported correctly
+import but from "@/styles/button.module.css";
 
 export const StepTokenGen = () => {
-  // 1. State for the *live* text area input
   const [inputText, setInputText] = useState("");
 
-  // 2. State for the *submitted* text to be passed to the SearchTree
   const [submittedPrompt, setSubmittedPrompt] = useState<string | null>(null);
 
-  // Function to handle the button click
   const handleStartSearch = useCallback(() => {
-    // Basic validation
     if (inputText.trim() === "") {
       alert("Please enter some text to begin the search tree.");
       return;
@@ -30,13 +25,10 @@ export const StepTokenGen = () => {
 
   return (
     <div className={styles.container}>
-      {/* Textarea remains a standard controlled component */}
       <TextareaInput onTextChange={setInputText} value={inputText} />
       <Button
-        variant="default"
+        className={but.btnPrimary}
         onClick={handleStartSearch}
-        // Button is disabled if the input is empty or the tree is already displayed
-        // using the *current* input text (optional, but good UX)
         disabled={
           inputText.trim() === "" ||
           (isTreeReady && submittedPrompt === inputText.trim())
@@ -44,8 +36,6 @@ export const StepTokenGen = () => {
       >
         {isTreeReady ? "Restart Search Tree" : "Start Search Tree"}
       </Button>
-
-      {/* 3. Render SearchTree using the submittedPrompt */}
       {isTreeReady && <SearchTree initialPrompt={submittedPrompt} />}
     </div>
   );

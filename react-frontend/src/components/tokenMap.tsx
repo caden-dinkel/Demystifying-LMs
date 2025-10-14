@@ -7,7 +7,7 @@ export interface TokenMapProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const TokenMap = ({ tokenData, onSelection }: TokenMapProps) => {
   return (
-    <div className="token-map-container" style={{ display: "table-column" }}>
+    <div>
       {tokenData.map((token) => (
         <TokenChip
           id={token.id}

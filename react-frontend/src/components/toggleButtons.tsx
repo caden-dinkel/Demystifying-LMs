@@ -20,7 +20,7 @@ export const ToggleButton = ({
   value,
 }: ToggleButtonProps) => {
   return (
-    <>
+    <div className={styles.toggleGroup}>
       {options.map((option) => (
         <Button
           key={option.key}
@@ -32,6 +32,6 @@ export const ToggleButton = ({
           {option.icon ? option.icon : option.label}
         </Button>
       ))}
-    </>
+    </div>
   );
 };
