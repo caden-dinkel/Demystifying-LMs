@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useRef } from "react";
 import navbar from "@/styles/navBar.module.css";
 import { ActiveLink } from "./activeLink";
