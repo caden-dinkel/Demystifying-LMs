@@ -1,0 +1,6 @@
+torch==2.5.1
+tiktoken==0.7.0
+notebook
+ipykernel
+jupyterlab
+numpy<2
