@@ -10,7 +10,7 @@ Follow the instructions below to run both parts of the project.
 
 2. Run the backend server:
    ```
-   python app.py
+   uvicorn app:app
    ```
    Leave this terminal open to keep the backend server running.
 
