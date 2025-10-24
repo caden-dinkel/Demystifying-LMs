@@ -1,3 +1,5 @@
+// react-frontend/src/app/page.tsx
+
 // DO NOT add "use client" here.
 // This must be a Server Component to read files from the server.
 
@@ -14,9 +16,9 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 export default function Home() {
-    // Construct the full path to your .md file
+    // Construct the full path to the .md file
     const mdFilePath = path.join(
-        process.cwd(), // Gets the root directory of your project
+        process.cwd(),
         "src",
         "app",
         "content",
@@ -36,10 +38,6 @@ export default function Home() {
         <>
             <Navbar />
             <main className="flex flex-col items-center p-12 md:p-24">
-                {/* FIX: Added 'dark:prose-invert' here. 
-                  This tells Tailwind's typography plugin to use light-colored
-                  text when dark mode is enabled (when the <html> tag has 'class="dark"').
-                */}
                 <article className="prose lg:prose-xl dark:prose-invert max-w-5xl">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {content}

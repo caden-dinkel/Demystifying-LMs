@@ -1,3 +1,5 @@
+"use client";
+
 import { TreeNode } from "@/lib/types";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { getTokenProbabilities } from "@/api/getTokenProbs";

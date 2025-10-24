@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "./button";
 import { SearchTree } from "./searchTree";
 import { TextareaInput } from "./textBox";
