@@ -22,7 +22,8 @@ export default function GenerateTokens() {
         "src",
         "app",
         "content",
-        "generate_tokens.md"
+        "token_generation",
+        "demo_intro.md"
     );
 
     let descriptionContent = "Error: generate_tokens.md file not found."; // Default message

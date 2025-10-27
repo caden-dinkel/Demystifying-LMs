@@ -37,10 +37,6 @@ export const TextGenerator = () => {
   };
   return (
     <div>
-      <p>
-        Enter the start of a story or sentence to generate a completion to the
-        text.
-      </p>
       <TextareaInput value={prompt} onTextChange={(e) => setPrompt(e)} />
 
       <button

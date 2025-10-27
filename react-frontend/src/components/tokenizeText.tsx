@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Token } from "@/lib/types";
 import { postTokenizeText } from "@/api/postTokenizeText";
@@ -24,10 +26,6 @@ export const Tokenizer = () => {
   };
   return (
     <div>
-      <h2>2. Visual Tokenizer</h2>
-      <p>
-        Enter any text to see how the GPT-2 model breaks it down into tokens.
-      </p>
       <TextareaInput value={prompt} onTextChange={(e) => setPrompt(e)} />
 
       <Button onClick={handleTokenize} className={button.btnPrimary}>

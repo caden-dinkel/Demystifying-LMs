@@ -22,7 +22,8 @@ export default function Home() {
         "src",
         "app",
         "content",
-        "tokenizer_home.md"
+        "home",
+        "tokenizer_ex.md"
     );
 
     let content = "Error: tokenizer.md file not found."; // Default message
