@@ -9,4 +9,4 @@ To do this, the model must first break your sentence down into manageable pieces
 ### Here's how it works:
 1. Type any text into the 'Text to Analyze' box.
 2. Click the 'Tokenize Text' button.
-3. The ourput box below will display how the model 'sees' your text, breaking it down into tokens along with their corresponding IDs. This gives you insight into the first step of how language models process and understand human language.
+3. The output box below will display how the model 'sees' your text, breaking it down into tokens along with their corresponding IDs. This gives you insight into the first step of how language models process and understand human language.
