@@ -12,15 +12,32 @@ import { LMTextarea } from "@/components/lmTextarea";
 // Import the markdown renderer
 
 export default function Home() {
-  const handleSend = (input: string, lm: string) => {
-    // Handle the send action from LMTextarea
-  };
+  // Construct the full path to the .md file
+  const mdFilePath = path.join(
+    process.cwd(),
+    "src",
+    "app",
+    "content",
+    "home",
+    "tokenizer_ex.md"
+  );
+
+  let content = "Error: tokenizer.md file not found."; // Default message
+
+  try {
+    // Read the content of the file
+    content = fs.readFileSync(mdFilePath, "utf8");
+  } catch (err) {
+    console.error(err);
+  }
+
   return (
     <>
       <Navbar />
       <main className="flex flex-col items-center p-12 md:p-24">
-        {/* Main landing page content will go here. */}
-        High Level Overview and Introduction to the Application.
+        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        </article>
       </main>
     </>
   );

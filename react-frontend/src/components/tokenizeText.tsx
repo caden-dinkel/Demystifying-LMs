@@ -11,9 +11,24 @@ import { LMTextarea, ExamplePromptButton } from "./lmTextarea";
 import { cn } from "@/lib/utils";
 
 export const Tokenizer = () => {
-    const [tokenizedOutput, setTokenizedOutput] = useState<Token[]>();
-    const [prompt, setPrompt] = useState("");
-    const { selectedLM } = useLMSettings();
+  const [tokenizedOutput, setTokenizedOutput] = useState<Token[]>();
+  const [prompt, setPrompt] = useState("");
+  const handleTokenize = async () => {
+    if (!prompt) {
+      alert("Please enter a prompt!");
+      return;
+    }
+    try {
+      const data = await postTokenizeText(prompt);
+      console.log(data);
+      setTokenizedOutput(data);
+    } catch (error) {
+      console.error("Error Tokenizing Text:", error);
+    }
+  };
+  return (
+    <div>
+      <TextareaInput value={prompt} onTextChange={(e) => setPrompt(e)} />
 
     const handleTokenize = async (input: string) => {
         if (!input) {

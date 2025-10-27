@@ -38,12 +38,14 @@ export const TextGenerator = () => {
     }
   };
   return (
-    <div className="space-y-4">
-      <p className="text-muted-foreground">
-        Enter the start of a story or sentence to generate a completion to the
-        text.
-      </p>
-      <Button onClick={handleGenerate} disabled={isLoading}>
+    <div>
+      <TextareaInput value={prompt} onTextChange={(e) => setPrompt(e)} />
+
+      <button
+        onClick={handleGenerate}
+        disabled={isLoading}
+        className={styles.button}
+      >
         {isLoading ? "Generating..." : "Generate Text"}
       </Button>
 
