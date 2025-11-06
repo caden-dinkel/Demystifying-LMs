@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/themeProvider";
+import { ThemeProvider } from "@/components/settings/themeProvider";
 import "@/styles/globals.css";
 
 const geistSans = Geist({
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "How Language Models Work",
   description:
-    "A simple and explorative breakdown of language models and their components. Look within and get a visual and intuitive understanding of language models and their operations.",
+    "A simple and explorative breakdown of language models and their components. Look into the box and get a visual and intuitive understanding of language models and their operations.",
 };
 
 export default function RootLayout({

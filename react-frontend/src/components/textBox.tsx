@@ -32,7 +32,7 @@ export const TextareaInput: React.FC<TextareaInputProps> = ({
         value={value} // **Controlled Component:** Value is tied to state
         onChange={(e) => onTextChange(e.target.value)} // **Controlled Component:** Updates state on change
         placeholder={placeholder}
-        rows={6} // Set a default visible height
+        rows={1} // Set a default visible height
         disabled={disabled}
       />
     </div>

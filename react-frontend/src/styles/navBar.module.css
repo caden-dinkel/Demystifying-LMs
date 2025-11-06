@@ -8,7 +8,7 @@
 }
 
 .navLinksContainer {
-  display: flex;
+  display: relative;
   align-items: center;
   gap: 1.5rem;
 }
@@ -29,20 +29,31 @@
 }
 
 .navLink {
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem 0.75rem;
   @apply text-muted-foreground transition-colors hover:text-foreground;
   font-weight: 500;
-}
-
-.navLink:hover {
-  @apply bg-muted text-foreground;
+  position: relative;
 }
 
 .activeLink {
   padding: 0.5rem 0.75rem;
   @apply text-foreground font-semibold;
+  position: relative;
 }
 
-.activeLink:hover {
-  @apply bg-muted text-foreground;
+.navLinkIndicator {
+  position: absolute;
+  bottom: 0rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  height: 2px;
+  background-color: hsl(var(--foreground));
+  transform-origin: left;
+  transition: transform 0.3s ease-out;
+}
+.navLinkIndicatorHidden {
+  transform: scaleX(0);
+}
+.navLinkIndicatorVisible {
+  transform: scaleX(1);
 }

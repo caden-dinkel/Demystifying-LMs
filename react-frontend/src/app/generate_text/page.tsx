@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "@/components/navBar";
+import Navbar from "@/components/navigation/navBar";
 import React from "react";
 import { TextGenerator } from "@/components/textGen";
 import styles from "@/styles/main-layout.module.css";
