@@ -2,7 +2,7 @@
 import styles from "@/styles/tokens.module.css";
 import React from "react";
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
-import { TreeNode, TokenData } from "@/lib/types";
+import { TreeNode, TokenData } from "@/utilities/types";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { PromptDisplay } from "./promptDisplay";
 import { SearchTreeConnector } from "./treeBranches";

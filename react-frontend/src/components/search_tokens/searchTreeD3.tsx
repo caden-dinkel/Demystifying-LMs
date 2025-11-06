@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
-import { TreeNode } from "@/lib/types"; // Your existing type
+import { TreeNode } from "@/utilities/types"; // Your existing type
 
 interface D3TreeProps {
   searchTree: Map<string, TreeNode>;

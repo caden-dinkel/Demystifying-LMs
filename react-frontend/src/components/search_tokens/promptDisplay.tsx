@@ -1,4 +1,4 @@
-import { TokenData } from "@/lib/types";
+import { TokenData } from "@/utilities/types";
 import styles from "@/styles/tokens.module.css";
 import { PromptToken } from "./promptToken";
 import { useEffect } from "react";

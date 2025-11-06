@@ -2,7 +2,7 @@
 import React from "react";
 
 import { useState } from "react";
-import { Token } from "@/lib/types";
+import { Token } from "@/utilities/types";
 import { postTokenizeText } from "@/api/postTokenizeText";
 import button from "@/styles/button.module.css";
 import toks from "@/styles/tokens.module.css";

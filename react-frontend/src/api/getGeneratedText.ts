@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LMOutput } from "../lib/types";
+import { LMOutput } from "../utilities/types";
 import { API_BASE_URL } from "./config";
 
 export const getGeneratedText = async (prompt: string): Promise<LMOutput> => {

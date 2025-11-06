@@ -3,7 +3,7 @@
 // ... (imports remain, except for the removed visual components)
 import React, { useRef, useState } from "react";
 import { D3TokenSearchTree } from "./searchTreeD3"; // New import
-import { TreeNode } from "@/lib/types";
+import { TreeNode } from "@/utilities/types";
 // ...
 
 export interface TokenSearchProps {

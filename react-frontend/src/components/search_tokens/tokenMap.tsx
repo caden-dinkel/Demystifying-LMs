@@ -1,7 +1,7 @@
 // tokenMap.tsx
 
 import { TokenChip } from "@/components/search_tokens/tokenChip";
-import { TokenData } from "@/lib/types";
+import { TokenData } from "@/utilities/types";
 import React, { useRef, useEffect, useCallback, useState } from "react";
 
 export interface TokenMapProps extends React.HTMLAttributes<HTMLDivElement> {
