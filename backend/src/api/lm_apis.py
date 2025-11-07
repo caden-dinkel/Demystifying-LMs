@@ -41,7 +41,7 @@ def get_lm_components(model_name: str):
 
 def prepare_prompt(prompt: str):
     # Wraps prompt in a message for llama queries
-    return [{"role": "question answerer", "content": prompt}]
+    return [{"role": "user", "content": prompt}]
     
     
 
@@ -71,7 +71,7 @@ async def token_probs(data: LMInput): # Use 'data' instead of 'prompt'
     # ... rest of the logic remains the same, using the retrieved tokenizer/model
     try:
         # Pass the retrieved 'model' to the call
-        output = model(input_ids, max_new_tokens=1, output_scores=True)
+        output = model(**input_ids, max_new_tokens=1, output_scores=True)
         logits = output.logits
         probabilities = torch.nn.functional.softmax(logits[:, -1, :], dim=-1)
         top_k_probs, top_k_indices = torch.topk(probabilities, 10)

@@ -39,12 +39,14 @@ export const Tokenizer = () => {
         Tokenize Text
       </Button>
       {tokenizedOutput && (
-        <div className={toks.tokenizerOutput}>
-          {tokenizedOutput.map((token) => (
-            <span key={token.id} className={toks.token}>
-              {token.value.replace(/\u0120/g, " ")}
-            </span>
-          ))}
+        <div className={toks.promptDisplayContainer}>
+          <div className={toks.tokenizedOutput}>
+            {tokenizedOutput.map((token) => (
+              <span key={token.id} className={toks.tokenBase}>
+                {token.value.replace(/\u0120/g, " ")}
+              </span>
+            ))}
+          </div>
         </div>
       )}
     </div>

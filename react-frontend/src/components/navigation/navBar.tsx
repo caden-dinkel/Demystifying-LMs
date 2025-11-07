@@ -20,8 +20,8 @@ interface NavItem extends NavLink {
 // Data for sub-links (kept from your original file)
 const WorkNavLinks: NavLink[] = [
   { name: "Tokenizing Text", href: "/lms_work/tokenize_text" },
-  { name: "Searching for Words", href: "/lms_work/search_token" },
   { name: "Predicting Next Word", href: "/lms_work/predict_next" },
+  { name: "Searching for Words", href: "/lms_work/search_token" },
   { name: "Sequential Generation", href: "/lms_work/sequential_generation" },
 ];
 
@@ -33,8 +33,16 @@ const UsedNavLinks: NavLink[] = [
 // Combined navigation items data structure
 const NavItems: NavItem[] = [
   { name: "Home", href: "/" },
-  { name: "How LMs Work", href: "/lms_work", subOptions: WorkNavLinks },
-  { name: "How LMs can be Used", href: "/lms_used", subOptions: UsedNavLinks },
+  {
+    name: "How Language Models Work",
+    href: "/lms_work",
+    subOptions: WorkNavLinks,
+  },
+  {
+    name: "How Language Models Are Used",
+    href: "/lms_used",
+    subOptions: UsedNavLinks,
+  },
 ];
 
 const Navbar = () => {

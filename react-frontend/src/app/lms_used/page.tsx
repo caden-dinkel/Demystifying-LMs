@@ -12,7 +12,10 @@ export default function LMUses() {
       <Navbar />
 
       {/* 2. Main Content (The unique part of this page) */}
-      <main className={styles.baseMain}></main>
+      <main className={styles.baseMain}>
+        {/* Overview of how LMs are used */}
+        Overview of practical applications and use-cases of Language Models.
+      </main>
     </>
   );
 }
