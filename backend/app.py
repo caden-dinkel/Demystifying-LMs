@@ -1,7 +1,11 @@
+#from flask import Flask
+#from flask_cors import CORS
+#from api.generate_text import generate_text_bp
+#from api.generate_token_prob import generate_token_prob_bp
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api import lm_apis
+from src.api import lm_apis
 
 app = FastAPI()
 
@@ -9,8 +13,6 @@ origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000"
 ]
-
-#Allow for LM function and type to be passed with API.
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,3 +23,22 @@ app.add_middleware(
 )
 
 app.include_router(lm_apis.router)
+
+
+
+
+
+
+'''
+# Initialize the Flask application
+app = Flask(__name__)
+CORS(app)
+
+# Register the Blueprint. This adds all routes from generator_bp to the app.
+app.register_blueprint(generate_text_bp)
+app.register_blueprint(generate_token_prob_bp)
+
+# Run the Flask app
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
+'''
