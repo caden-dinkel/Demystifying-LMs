@@ -4,6 +4,7 @@ import React from "react";
 import { useState } from "react";
 import { Token } from "@/utilities/types";
 import { postTokenizeText } from "@/api/postTokenizeText";
+import { useLMSettings } from "@/components/settings/lmSettingsProvider";
 import button from "@/styles/button.module.css";
 import toks from "@/styles/tokens.module.css";
 import { Button } from "./button";
@@ -12,13 +13,14 @@ import { TextareaInput } from "./textBox";
 export const Tokenizer = () => {
   const [tokenizedOutput, setTokenizedOutput] = useState<Token[]>();
   const [prompt, setPrompt] = useState("");
+  const { modelName } = useLMSettings();
   const handleTokenize = async () => {
     if (!prompt) {
       alert("Please enter a prompt!");
       return;
     }
     try {
-      const data = await postTokenizeText(prompt);
+      const data = await postTokenizeText(prompt, modelName);
       console.log(data);
       setTokenizedOutput(data);
     } catch (error) {

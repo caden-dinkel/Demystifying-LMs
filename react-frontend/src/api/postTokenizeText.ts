@@ -2,13 +2,13 @@ import axios from "axios";
 import { API_BASE_URL } from "./config";
 import { Token } from "../utilities/types";
 
-//If there are bugs, you forgot the backend loser
-export const postTokenizeText = async (prompt: string): Promise<Token[]> => {
+export const postTokenizeText = async (prompt: string, modelName: string): Promise<Token[]> => {
   try {
     const response = await axios.post<Token[]>(
-      `${API_BASE_URL}lm/tokenize_text_gpt`,
+      `${API_BASE_URL}lm/tokenize_text`,
       {
         prompt,
+        model_name: modelName,
       }
     );
     return response.data;

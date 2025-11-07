@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { ToggleButton, ToggleOption } from "../toggleButtons";
+import { useLMSettings } from "./lmSettingsProvider";
 
 const lms: ToggleOption[] = [
     {key: "gpt2", label: "GPT2", blocked: false},
@@ -8,10 +9,10 @@ const lms: ToggleOption[] = [
 
 
 
-export const LMFunctionCombinedSwitch = () => {
-    const [selectedLM, setSelectedLM]= useState<string>("gpt2");
-    const [selectedFunction, setSelectedFunction] = useState<string>("completion");
 
+
+export const LMFunctionCombinedSwitch = () => {
+    const { selectedLM, selectedFunction, setSelectedLM, setSelectedFunction } = useLMSettings();
     const [functions, setFunctions] = useState<ToggleOption[]>([{key: "completion", label: "Text Completion", blocked: false}, {key: "query", label: "Query Response", blocked: true}])
 
     // Modify available functions depending on selected LM
@@ -26,21 +27,22 @@ export const LMFunctionCombinedSwitch = () => {
             setFunctions([{key: "completion", label: "Text Completion", blocked: true}, {key: "query", label: "Query Response", blocked: false}]);
             setSelectedFunction("query");
         }
-    }, [selectedLM]);
+    }, [selectedLM, setSelectedFunction]);
 
     // Handle Selecting any available value
     const handleFunctionSelection = useCallback((func: string) => {
         setSelectedFunction(func);
-    }, [])
+    }, [setSelectedFunction])
 
     // Handle Selecting an LM
     const handleLMSelection = useCallback((lm: string) => {
         setSelectedLM(lm)
-    }, [])
+    }, [setSelectedLM])
 
 
     return <>
     <ToggleButton options={lms} onChange={handleLMSelection} value={selectedLM}></ToggleButton>
+    <div style={{ marginTop: '1rem' }}></div> {/* Added spacing between toggle groups */}
     <ToggleButton options={functions} onChange={handleFunctionSelection} value={selectedFunction}></ToggleButton>
     </>
 }

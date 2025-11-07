@@ -18,6 +18,7 @@ export const StepTokenGen = () => {
 
     // Update the submitted prompt state, triggering the SearchTree to render
     setSubmittedPrompt(inputText.trim());
+    console.log("Starting search tree with prompt:", inputText.trim());
   }, [inputText]);
 
   // Use a boolean for cleaner JSX condition

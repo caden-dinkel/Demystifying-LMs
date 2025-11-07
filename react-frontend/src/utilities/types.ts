@@ -52,3 +52,15 @@ export interface AnimationCoords {
   endX: number;
   endY: number;
 }
+
+export interface StepData {
+  step: number;
+  top_k_tokens: string[];
+  top_k_probs: number[];
+  chosen_token: string;
+}
+
+export interface IterativeGenerationResponse {
+  generated_text: string;
+  steps: StepData[];
+}

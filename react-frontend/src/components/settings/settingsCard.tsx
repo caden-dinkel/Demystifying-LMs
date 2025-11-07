@@ -52,7 +52,7 @@ export const SettingsCard = () => {
           </CardHeader>
           <div className={settings.cardSeparator}></div>
 
-          <CardContent className="p-2">
+          <CardContent className="p-4">
             <h4 className={settings.sectionLabel}>Appearance</h4>
             <ThemeSwitch></ThemeSwitch>
             <h4 className={settings.sectionLabel}>

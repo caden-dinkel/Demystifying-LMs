@@ -9,7 +9,8 @@
   right: 0;
   z-index: 50;
   margin-top: 0.5rem;
-  width: auto;
+  width: 320px; /* Increased from auto to fixed width for larger card */
+  min-height: 200px; /* Added min-height for better presence */
   @apply shadow-lg;
 }
 
@@ -26,12 +27,12 @@
   @apply border-b border-border;
   /* Add margin/padding if you need space above or below the line */
   margin-top: 0;
-  margin-bottom: 0.5rem; /* Space before the content starts */
+  margin-bottom: 1rem; /* Increased from 0.5rem for better spacing */
 }
 
 .settingsSection {
   /* Tailwind: mb-4 */
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem; /* Increased from 1rem for better spacing */
   /* Add padding if necessary */
 }
 

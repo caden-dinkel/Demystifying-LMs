@@ -1,6 +1,3 @@
-"use client";
-
-import React, { useState, useCallback, useMemo } from "react";
 // Assuming you moved your .textarea style to a CSS module
 import styles from "@/styles/textbox.module.css";
 
@@ -19,10 +16,6 @@ export const TextareaInput: React.FC<TextareaInputProps> = ({
   onTextChange,
   disabled = false,
 }) => {
-  // 1. State to hold the current value of the textarea
-
-  // 2. Event handler to update the state on every keystroke
-
   return (
     <div className={styles.container}>
       <label htmlFor="user-input">Text to Analyze:</label>

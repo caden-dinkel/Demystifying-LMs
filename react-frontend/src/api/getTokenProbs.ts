@@ -3,12 +3,13 @@ import { TokenProb } from "../utilities/types";
 import { API_BASE_URL } from "./config";
 
 export const getTokenProbabilities = async (
-  prompt: string
+  prompt: string,
+  modelName: string
 ): Promise<TokenProb> => {
   try {
     const response = await axios.post<TokenProb>(
       `${API_BASE_URL}lm/token_probs`,
-      { prompt }
+      { prompt, model_name: modelName }
     );
     return response.data;
   } catch (error) {

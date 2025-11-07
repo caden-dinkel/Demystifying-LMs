@@ -39,6 +39,12 @@ def get_lm_components(model_name: str):
         SUPPORTED_MODELS[model_name]["pipeline"]
     )
 
+def prepare_prompt(prompt: str):
+    # Wraps prompt in a message for llama queries
+    return [{"role": "question answerer", "content": prompt}]
+    
+    
+
 @router.post("/token_probs")
 async def token_probs(data: LMInput): # Use 'data' instead of 'prompt'
     # 1. Select LM components based on input
@@ -92,3 +98,58 @@ async def tokenize_text(data: LMInput):
     except Exception as e:
         print(f"An error occurred during tokenization: {e}")
         raise HTTPException(status_code=500, detail="Error Tokenizing input text.")
+    
+class StepData(BaseModel):
+    step: int
+    top_k_tokens: list[str]
+    top_k_probs: list[float]
+    chosen_token: str
+
+class IterativeGenerationResponse(BaseModel):
+    generated_text: str
+    steps: list[StepData]
+
+@router.post("/iterative_generation")
+async def iterative_generation(data: LMInput) -> IterativeGenerationResponse:
+    tokenizer, model, _ = get_lm_components(data.model_name)
+    if data.model_name == "llama3_query":
+        message = prepare_prompt(data.prompt)
+        inputs = tokenizer.apply_chat_template(
+            message,
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt",
+        ).to(model.device)
+    elif data.model_name == "gpt2_completion":
+        inputs = tokenizer(
+            data.prompt,
+            return_tensors="pt",
+        ).to(model.device)
+    else:
+        raise HTTPException(status_code=500, detail=f"Issue with LM/Functionality Combination")
+
+    outputs = model.generate(**inputs, max_new_tokens=20, output_scores=True, return_dict_in_generate=True, do_sample=False)
+    # outputs.scores is list of logits for each generated step, shape (batch, vocab) per step
+    generated_tokens = outputs.sequences[0][inputs['input_ids'].shape[1]:]  # get only new tokens
+    generated_text = tokenizer.decode(generated_tokens, skip_special_tokens=True)
+    
+    # Collect top k for each generated step
+    steps_data = []
+    for i, step_logits in enumerate(outputs.scores):
+        probabilities = torch.softmax(step_logits.squeeze(0), dim=-1)
+        top_k_probs, top_k_indices = torch.topk(probabilities, k=10)
+        top_k_tokens = tokenizer.convert_ids_to_tokens(top_k_indices.tolist())
+        chosen_token_id = generated_tokens[i].item()
+        chosen_token = tokenizer.convert_ids_to_tokens(chosen_token_id)
+        steps_data.append({
+            "step": i + 1,
+            "top_k_tokens": top_k_tokens,
+            "top_k_probs": top_k_probs.tolist(),
+            "chosen_token": chosen_token
+        })
+    
+    return IterativeGenerationResponse(
+        generated_text=generated_text,
+        steps=[StepData(**step) for step in steps_data]
+    )

@@ -4,6 +4,7 @@ import React from "react";
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { TreeNode, TokenData } from "@/utilities/types";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
+import { useLMSettings } from "@/components/settings/lmSettingsProvider";
 import { PromptDisplay } from "./promptDisplay";
 import { SearchTreeConnector } from "./treeBranches";
 import { TokenMap } from "./tokenMap";
@@ -20,11 +21,35 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
     return newId;
   };
 
+  const { modelName } = useLMSettings();
   // --- State Initialization (SSoT) ---
   // Data to know values of lhs and rhs tokens
   // Key of each node refers to id of last lhs token
-  const [searchTree, setSearchTree] = useState<Map<string, TreeNode>>(() => {
-    if (!initialPrompt) return new Map();
+  const [searchTree, setSearchTree] = useState<Map<string, TreeNode>>(new Map());
+
+  const [animationData, setAnimationData] = useState<{
+    startCoords: DOMRect;
+    endId: string;
+  } | null>(null);
+
+  // Stores current string of tokens that form the search path.
+  const [searchPath, setSearchPath] = useState<string[]>([]);
+
+  const [lhsRect, setLhsRect] = useState<DOMRect | null>(null);
+  const [rhsRects, setRhsRects] = useState<DOMRect[]>([]);
+
+  // Reset state when initialPrompt changes
+  useEffect(() => {
+    if (!initialPrompt) {
+      setSearchTree(new Map());
+      setSearchPath([]);
+      setAnimationData(null);
+      setLhsRect(null);
+      setRhsRects([]);
+      nextIdRef.current = 0; // Reset ID counter
+      return;
+    }
+
     const rootNode: TreeNode = {
       id: "initial",
       token: initialPrompt,
@@ -33,23 +58,13 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
       childrenNodeIds: [],
       isSelected: true,
     };
-    return new Map([[rootNode.id, rootNode]]);
-  });
-
-  const [animationData, setAnimationData] = useState<{
-    startCoords: DOMRect;
-    endId: string;
-  } | null>(null);
-
-  // Stores current string of tokens that form the search path.
-  const [searchPath, setSearchPath] = useState<string[]>(() => {
-    return initialPrompt ? ["initial"] : [];
-  });
-
-  const [lhsRect, setLhsRect] = useState<DOMRect | null>(null);
-  const [rhsRects, setRhsRects] = useState<DOMRect[]>([]);
-
-  // Data to know bounding box of animation
+    setSearchTree(new Map([[rootNode.id, rootNode]]));
+    setSearchPath(["initial"]);
+    setAnimationData(null);
+    setLhsRect(null);
+    setRhsRects([]);
+    nextIdRef.current = 0; // Reset ID counter
+  }, [initialPrompt]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const parentRect = containerRef.current?.getBoundingClientRect() ?? null;
@@ -67,7 +82,7 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
 
     const fetchAndPopulateRoot = async () => {
       try {
-        const data = await getTokenProbabilities(initialPrompt);
+        const data = await getTokenProbabilities(initialPrompt, modelName);
         const normalizedProbs = normalizeProbabilities(data.probabilities);
         setSearchTree((prevTree) => {
           const newTree = new Map(prevTree);
@@ -120,7 +135,7 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
 
     // Fetch New Tokens and update all state atomically
     try {
-      const data = await getTokenProbabilities(promptForApi);
+      const data = await getTokenProbabilities(promptForApi, modelName);
       const normalizedProbs = normalizeProbabilities(data.probabilities);
       const newChildrenIds = data.tokens.map(() => getNextId());
 

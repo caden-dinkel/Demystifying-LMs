@@ -2,6 +2,7 @@
 "use client";
 import { useState } from "react";
 import { getGeneratedText } from "@/api/getGeneratedText";
+import { useLMSettings } from "@/components/settings/lmSettingsProvider";
 import styles from "@/styles/page.module.css";
 import { TextareaInput } from "./textBox";
 
@@ -11,6 +12,7 @@ export const TextGenerator = () => {
     "The model's output will appear here..."
   );
   const [isLoading, setIsLoading] = useState(false);
+  const { modelName } = useLMSettings();
 
   const handleGenerate = async () => {
     if (!prompt) {
@@ -23,7 +25,7 @@ export const TextGenerator = () => {
 
     try {
       // The API call to your Python backend remains the same
-      const data = await getGeneratedText(prompt);
+      const data = await getGeneratedText(prompt, modelName);
 
       setResult(data.prompt);
     } catch (error) {
