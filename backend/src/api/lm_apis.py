@@ -50,7 +50,21 @@ async def token_probs(data: LMInput): # Use 'data' instead of 'prompt'
     # 1. Select LM components based on input
     tokenizer, model, _ = get_lm_components(data.model_name)
     
-    encoded_prompt = tokenizer(data.prompt, return_tensors='pt')
+    # Prepare inputs based on model
+    if data.model_name == "llama3_query":
+        message = prepare_prompt(data.prompt)
+        encoded_prompt = tokenizer.apply_chat_template(
+            message,
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt",
+        )
+    elif data.model_name == "gpt2_completion":
+        encoded_prompt = tokenizer(data.prompt, return_tensors='pt')
+    else:
+        raise HTTPException(status_code=500, detail=f"Issue with LM/Functionality Combination")
+    
     input_ids = encoded_prompt['input_ids']
     
     # ... rest of the logic remains the same, using the retrieved tokenizer/model
@@ -74,11 +88,24 @@ async def token_probs(data: LMInput): # Use 'data' instead of 'prompt'
 @router.post("/generate_text")
 async def generate_text(data: LMInput):
     # 1. Select LM components based on input
-    _, _, generator = get_lm_components(data.model_name)
+    tokenizer, _, generator = get_lm_components(data.model_name)
+
+    # Prepare prompt based on model
+    if data.model_name == "llama3_query":
+        message = prepare_prompt(data.prompt)
+        prompt = tokenizer.apply_chat_template(
+            message,
+            add_generation_prompt=True,
+            tokenize=False,
+        )
+    elif data.model_name == "gpt2_completion":
+        prompt = data.prompt
+    else:
+        raise HTTPException(status_code=500, detail=f"Issue with LM/Functionality Combination")
 
     try:
         # Use the retrieved 'generator' pipeline
-        output = generator(data.prompt, max_length=50, num_return_sequences=1)
+        output = generator(prompt, max_length=50, num_return_sequences=1)
         generated_text = output[0]['generated_text']
         response_data = LMOutput(token=generated_text) # Include model_name in response
         return response_data
@@ -89,8 +116,22 @@ async def generate_text(data: LMInput):
 @router.post("/tokenize_text")
 async def tokenize_text(data: LMInput):
     tokenizer, _, _ = get_lm_components(data.model_name)
+    
+    # Prepare text to tokenize based on model
+    if data.model_name == "llama3_query":
+        message = prepare_prompt(data.prompt)
+        text_to_tokenize = tokenizer.apply_chat_template(
+            message,
+            add_generation_prompt=True,
+            tokenize=False,
+        )
+    elif data.model_name == "gpt2_completion":
+        text_to_tokenize = data.prompt
+    else:
+        raise HTTPException(status_code=500, detail=f"Issue with LM/Functionality Combination")
+    
     try:
-        token_ids = tokenizer.encode(data.prompt)
+        token_ids = tokenizer.encode(text_to_tokenize)
         tokens = tokenizer.convert_ids_to_tokens(token_ids)
         result = [Token(value=val, id=tid) for val, tid in zip(tokens, token_ids)]
         print(f"{result}")

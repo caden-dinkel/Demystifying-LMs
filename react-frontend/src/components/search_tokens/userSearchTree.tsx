@@ -64,23 +64,9 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
     setLhsRect(null);
     setRhsRects([]);
     nextIdRef.current = 0; // Reset ID counter
-  }, [initialPrompt]);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  const parentRect = containerRef.current?.getBoundingClientRect() ?? null;
-
-  // Helper function to normalize token probabilities
-  const normalizeProbabilities = (probabilities: number[]): number[] => {
-    const sum = probabilities.reduce((acc, prob) => acc + prob, 0);
-    if (sum === 0) return probabilities.map(() => 0);
-    return probabilities.map((prob) => prob / sum);
-  };
-
-  // Populates initial node and its children upon run or a change in initial prompt.
-  useEffect(() => {
-    if (!initialPrompt || searchPath.length === 0) return;
-
-    const fetchAndPopulateRoot = async () => {
+    // Fetch children for the root node
+    const fetchInitialChildren = async () => {
       try {
         const data = await getTokenProbabilities(initialPrompt, modelName);
         const normalizedProbs = normalizeProbabilities(data.probabilities);
@@ -115,11 +101,18 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
       }
     };
 
-    // Only fetch if the root exists but has no children yet.
-    if (searchTree.get("initial")?.childrenNodeIds.length === 0) {
-      fetchAndPopulateRoot();
-    }
-  }, [initialPrompt]);
+    fetchInitialChildren();
+  }, [initialPrompt, modelName]);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const parentRect = containerRef.current?.getBoundingClientRect() ?? null;
+
+  // Helper function to normalize token probabilities
+  const normalizeProbabilities = (probabilities: number[]): number[] => {
+    const sum = probabilities.reduce((acc, prob) => acc + prob, 0);
+    if (sum === 0) return probabilities.map(() => 0);
+    return probabilities.map((prob) => prob / sum);
+  };
 
   // Handler for clicking a token on the rhs.
   const handleNextToken = async (selectedId: string, startCoords: DOMRect) => {
@@ -260,7 +253,7 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
     <div className={styles.animationContainer} ref={containerRef}>
       <div className={styles.contentContainer}>
         <div className={styles.lhsContainer}>
-          {rhsRects.length !== 0 && (
+          {searchPath.length > 0 && (
             <PromptDisplay
               currentTokens={lhsTokenData}
               onNodeClick={handlePrevNode}
@@ -278,7 +271,7 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
           </div>
         </div>
       </div>
-      {connectorsData && (
+      {connectorsData !== null && (
         <SearchTreeConnector
           lhsBox={connectorsData.lhsBox}
           rhsBoxes={connectorsData.rhsBoxes}
