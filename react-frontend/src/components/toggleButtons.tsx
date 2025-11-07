@@ -6,6 +6,7 @@ export interface ToggleOption {
   key: string;
   label?: string;
   icon?: React.ReactNode;
+  blocked?: boolean;
 }
 
 export interface ToggleButtonProps {
@@ -24,6 +25,7 @@ export const ToggleButton = ({
       {options.map((option) => (
         <Button
           key={option.key}
+          disabled={option.blocked}
           onClick={() => onChange(option.key)}
           className={
             option.key === value ? styles.toggleSelected : styles.toggleNormal
