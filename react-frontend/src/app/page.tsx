@@ -15,7 +15,10 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <main className="flex flex-col items-center p-12 md:p-24"></main>
+      <main className="flex flex-col items-center p-12 md:p-24">
+        {/* Main landing page content will go here. */}
+        High Level Overview and Introduction to the Application.
+      </main>
     </>
   );
 }

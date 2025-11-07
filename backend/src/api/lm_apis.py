@@ -49,6 +49,7 @@ def prepare_prompt(prompt: str):
 async def token_probs(data: LMInput): # Use 'data' instead of 'prompt'
     # 1. Select LM components based on input
     tokenizer, model, _ = get_lm_components(data.model_name)
+    print(f"🔍 Token probabilities requested using model: {model.__class__.__name__} ({data.model_name})")
     
     # Prepare inputs based on model
     if data.model_name == "llama3_query":
@@ -89,6 +90,7 @@ async def token_probs(data: LMInput): # Use 'data' instead of 'prompt'
 async def generate_text(data: LMInput):
     # 1. Select LM components based on input
     tokenizer, _, generator = get_lm_components(data.model_name)
+    print(f"📝 Text generation requested using model: {generator.model.__class__.__name__} ({data.model_name})")
 
     # Prepare prompt based on model
     if data.model_name == "llama3_query":
@@ -116,6 +118,7 @@ async def generate_text(data: LMInput):
 @router.post("/tokenize_text")
 async def tokenize_text(data: LMInput):
     tokenizer, _, _ = get_lm_components(data.model_name)
+    print(f"🔤 Tokenization requested using model: {tokenizer.__class__.__name__} ({data.model_name})")
     
     # Prepare text to tokenize based on model
     if data.model_name == "llama3_query":
@@ -153,6 +156,8 @@ class IterativeGenerationResponse(BaseModel):
 @router.post("/iterative_generation")
 async def iterative_generation(data: LMInput) -> IterativeGenerationResponse:
     tokenizer, model, _ = get_lm_components(data.model_name)
+    print(f"🔄 Iterative generation requested using model: {model.__class__.__name__} ({data.model_name})")
+    
     if data.model_name == "llama3_query":
         message = prepare_prompt(data.prompt)
         inputs = tokenizer.apply_chat_template(

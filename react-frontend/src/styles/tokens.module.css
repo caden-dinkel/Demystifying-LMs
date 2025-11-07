@@ -81,9 +81,45 @@
 
   /* Adjustments from previous structure */
   max-height: 100%; /* Still good for vertical containment */
-  padding: 5px; /* Add padding for aesthetics and scrollbar visibility */
-  /* This setup makes the container never wider than 300px, but it will 
-     shrink below 300px on small viewports to prevent horizontal page scrolling. */
+  padding: 8px; /* Increased padding for better spacing */
+  border-radius: 6px; /* Add rounded corners */
+
+  /* Custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.promptDisplayContainer::-webkit-scrollbar {
+  height: 6px;
+}
+
+.promptDisplayContainer::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.promptDisplayContainer::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+.promptDisplayContainer::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+.promptDisplayWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 300px;
+  width: 100%;
+}
+
+.promptDisplayLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  margin-bottom: 4px;
 }
 
 /* Check These - Define here for mobile */

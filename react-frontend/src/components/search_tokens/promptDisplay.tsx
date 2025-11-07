@@ -32,15 +32,18 @@ export const PromptDisplay = ({
     if (onContainerRender) onContainerRender(rect);
   }, [currentTokens.length]);
   return (
-    <div className={styles.promptDisplayContainer} ref={containerRef}>
-      {currentTokens.map((tokenData) => (
-        <PromptToken
-          key={tokenData.id}
-          id={tokenData.id}
-          token={tokenData.token}
-          onNodeClick={onNodeClick}
-        />
-      ))}
+    <div className={styles.promptDisplayWrapper}>
+      <label className={styles.promptDisplayLabel}>Current Prompt</label>
+      <div className={styles.promptDisplayContainer} ref={containerRef}>
+        {currentTokens.map((tokenData) => (
+          <PromptToken
+            key={tokenData.id}
+            id={tokenData.id}
+            token={tokenData.token}
+            onNodeClick={onNodeClick}
+          />
+        ))}
+      </div>
     </div>
   );
 };

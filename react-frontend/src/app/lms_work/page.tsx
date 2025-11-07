@@ -5,7 +5,7 @@ import React from "react";
 import { StepTokenGen } from "@/components/search_tokens/stepGeneration";
 import styles from "@/styles/main-layout.module.css";
 
-export default function LM_Planning() {
+export default function TokenizeText() {
   return (
     <>
       {/* 1. Navbar (Navigation, outside the main content) */}
@@ -13,8 +13,8 @@ export default function LM_Planning() {
 
       {/* 2. Main Content (The unique part of this page) */}
       <main className={styles.baseMain}>
-        {/* LM Planning Component */}
-        Future component for planning with LLMs will go here.
+        {/* Overview of how LMs work */}
+        TODO: High level overview of subComponents and how they interact.
       </main>
     </>
   );

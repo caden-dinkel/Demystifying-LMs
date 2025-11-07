@@ -20,8 +20,9 @@ interface NavItem extends NavLink {
 // Data for sub-links (kept from your original file)
 const WorkNavLinks: NavLink[] = [
   { name: "Tokenizing Text", href: "/lms_work/tokenize_text" },
-  { name: "Generating Tokens", href: "/lms_work/generate_tokens" },
-  { name: "Searching for Tokens", href: "/lms_work/search_tokens" },
+  { name: "Searching for Words", href: "/lms_work/search_token" },
+  { name: "Predicting Next Word", href: "/lms_work/predict_next" },
+  { name: "Sequential Generation", href: "/lms_work/sequential_generation" },
 ];
 
 const UsedNavLinks: NavLink[] = [

@@ -15,7 +15,7 @@ import path from "path";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export default function GenerateTokens() {
+export default function SearchToken() {
   // Construct the full path to the .md file
   const mdFilePath = path.join(
     process.cwd(),

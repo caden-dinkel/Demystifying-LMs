@@ -25,7 +25,9 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
   // --- State Initialization (SSoT) ---
   // Data to know values of lhs and rhs tokens
   // Key of each node refers to id of last lhs token
-  const [searchTree, setSearchTree] = useState<Map<string, TreeNode>>(new Map());
+  const [searchTree, setSearchTree] = useState<Map<string, TreeNode>>(
+    new Map()
+  );
 
   const [animationData, setAnimationData] = useState<{
     startCoords: DOMRect;
@@ -253,7 +255,7 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
     <div className={styles.animationContainer} ref={containerRef}>
       <div className={styles.contentContainer}>
         <div className={styles.lhsContainer}>
-          {searchPath.length > 0 && (
+          {rhsRects.length > 0 && (
             <PromptDisplay
               currentTokens={lhsTokenData}
               onNodeClick={handlePrevNode}
