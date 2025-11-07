@@ -8,14 +8,18 @@ const functions: ToggleOption[] = [
   { key: "query", label: "Query Response" },
 ];
 
-export const FunctionSwitch = () => {
-  const [currentFunction, setCurrentFunction] = useState("completion");
+export interface FunctionSwitchProps {
+  onChange: (selectedFunction: string) => void;
+  value: string;
+}
+
+export const FunctionSwitch = ({onChange, value}: FunctionSwitchProps) => {
   return (
     <>
       <ToggleButton
         options={functions}
-        onChange={(value) => setCurrentFunction(value)}
-        value={currentFunction}
+        onChange={(value) => onChange(value)}
+        value={value}
       ></ToggleButton>
     </>
   );

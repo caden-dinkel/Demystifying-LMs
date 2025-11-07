@@ -1,5 +1,4 @@
 import { ToggleButton, ToggleOption } from "../toggleButtons";
-import { useState } from "react";
 
 //Can add more later
 //Still need to implement backend functionality
@@ -8,14 +7,18 @@ const lms: ToggleOption[] = [
   { key: "gpt2", label: "GPT2" },
 ];
 
-export const LMSwitch = () => {
-  const [currentLM, setCurrentLM] = useState("gpt2");
+export interface LMSwitchProps {
+  value: string;
+  onChange: (selectedLM: string) => void;
+}
+
+export const LMSwitch = ({onChange, value}: LMSwitchProps) => {
   return (
     <>
       <ToggleButton
         options={lms}
-        onChange={(value) => setCurrentLM(value)}
-        value={currentLM}
+        onChange={(value) => onChange(value)}
+        value={value}
       ></ToggleButton>
     </>
   );
