@@ -1,5 +1,6 @@
 "use client";
-import styles from "@/styles/tokens.module.css";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import React from "react";
 
 export interface PromptTokenProps {
@@ -10,8 +11,16 @@ export interface PromptTokenProps {
 
 export const PromptToken = ({ id, token, onNodeClick }: PromptTokenProps) => {
   return (
-    <div className={styles.tokenBase} onClick={() => onNodeClick(id)}>
+    <Button
+      variant="secondary"
+      size="sm"
+      className={cn(
+        "inline-flex cursor-pointer select-none transition-colors",
+        "hover:bg-muted"
+      )}
+      onClick={() => onNodeClick(id)}
+    >
       <span>{token}</span>
-    </div>
+    </Button>
   );
 };

@@ -1,21 +1,37 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import Navbar from "@/components/navigation/navBar";
-import React from "react";
-import styles from "@/styles/main-layout.module.css";
+import { LMTextarea } from "@/components/lmTextarea";
+import { TokenSearch } from "@/components/search_tokens/userSearchTree";
+import { ConnectorLayoutProvider } from "@/components/search_tokens/useConnectorLayout";
 
-export default function PredictNext() {
+export default function SequentialGeneration() {
+  const [prompt, setPrompt] = useState<string>("");
+  const [showTree, setShowTree] = useState<boolean>(false);
+
+  const handleStartSearch = useCallback((userPrompt: string) => {
+    setPrompt(userPrompt);
+    setShowTree(true);
+  }, []);
+
   return (
-    <>
-      {/* 1. Navbar (Navigation, outside the main content) */}
+    <div>
       <Navbar />
-
-      {/* 2. Main Content (The unique part of this page) */}
-      <main className={styles.baseMain}>
-        {/* Iterative Text generation animation/component */}
-        Future component for combined animation will go here. Tokens -{">"}
-        Model -{">"} Next Token Prediction
-      </main>
-    </>
+      <div
+        style={{
+          marginLeft: "1rem",
+          marginTop: "1rem",
+          width: "calc(100vw - 2rem)",
+        }}
+      >
+        <LMTextarea onSend={handleStartSearch} />
+        {showTree && (
+          <ConnectorLayoutProvider>
+            <TokenSearch initialPrompt={prompt} />
+          </ConnectorLayoutProvider>
+        )}
+      </div>
+    </div>
   );
 }

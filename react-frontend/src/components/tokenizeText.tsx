@@ -5,49 +5,60 @@ import { useState } from "react";
 import { Token } from "@/utilities/types";
 import { postTokenizeText } from "@/api/postTokenizeText";
 import { useLMSettings } from "@/components/settings/lmSettingsProvider";
-import button from "@/styles/button.module.css";
-import toks from "@/styles/tokens.module.css";
-import { Button } from "./button";
-import { TextareaInput } from "./textBox";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { LMTextarea } from "./lmTextarea";
+import { cn } from "@/lib/utils";
 
 export const Tokenizer = () => {
   const [tokenizedOutput, setTokenizedOutput] = useState<Token[]>();
   const [prompt, setPrompt] = useState("");
-  const { modelName } = useLMSettings();
-  const handleTokenize = async () => {
-    if (!prompt) {
+  const { selectedLM } = useLMSettings();
+
+  const handleTokenize = async (input: string) => {
+    if (!input) {
       alert("Please enter a prompt!");
       return;
     }
+    setPrompt(input);
     try {
-      const data = await postTokenizeText(prompt, modelName);
-      console.log(data);
+      const data = await postTokenizeText(input, selectedLM);
       setTokenizedOutput(data);
     } catch (error) {
       console.error("Error Tokenizing Text:", error);
+      throw error; // Re-throw to let LMTextarea handle loading state
     }
   };
-  return (
-    <div>
-      <h2>2. Visual Tokenizer</h2>
-      <p>
-        Enter any text to see how the GPT-2 model breaks it down into tokens.
-      </p>
-      <TextareaInput value={prompt} onTextChange={(e) => setPrompt(e)} />
 
-      <Button onClick={handleTokenize} className={button.btnPrimary}>
-        Tokenize Text
-      </Button>
+  return (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold">2. Visual Tokenizer</h2>
+      <p className="text-muted-foreground">
+        Enter any text to see how the model breaks it down into tokens.
+      </p>
+      <LMTextarea
+        onSend={handleTokenize}
+        placeholder="Enter text to tokenize..."
+      />
       {tokenizedOutput && (
-        <div className={toks.promptDisplayContainer}>
-          <div className={toks.tokenizedOutput}>
-            {tokenizedOutput.map((token) => (
-              <span key={token.id} className={toks.tokenBase}>
-                {token.value.replace(/\u0120/g, " ")}
-              </span>
-            ))}
-          </div>
-        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-wrap gap-1">
+              {tokenizedOutput.map((token) => (
+                <span
+                  key={token.id}
+                  className={cn(
+                    "inline-block px-2 py-1 rounded-md text-sm",
+                    "bg-secondary text-secondary-foreground",
+                    "border border-border"
+                  )}
+                >
+                  {token.value.replace(/\u0120/g, " ")}
+                </span>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

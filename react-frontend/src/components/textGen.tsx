@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { getGeneratedText } from "@/api/getGeneratedText";
 import { useLMSettings } from "@/components/settings/lmSettingsProvider";
-import styles from "@/styles/page.module.css";
-import { TextareaInput } from "./textBox";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const TextGenerator = () => {
   const [prompt, setPrompt] = useState("");
@@ -12,7 +12,7 @@ export const TextGenerator = () => {
     "The model's output will appear here..."
   );
   const [isLoading, setIsLoading] = useState(false);
-  const { modelName } = useLMSettings();
+  const { selectedLM } = useLMSettings();
 
   const handleGenerate = async () => {
     if (!prompt) {
@@ -25,9 +25,9 @@ export const TextGenerator = () => {
 
     try {
       // The API call to your Python backend remains the same
-      const data = await getGeneratedText(prompt, modelName);
+      const data = await getGeneratedText(prompt, selectedLM);
 
-      setResult(data.prompt);
+      setResult(data.token);
     } catch (error) {
       console.error("Error fetching data:", error);
       setResult(
@@ -38,23 +38,23 @@ export const TextGenerator = () => {
     }
   };
   return (
-    <div>
-      <p>
+    <div className="space-y-4">
+      <p className="text-muted-foreground">
         Enter the start of a story or sentence to generate a completion to the
         text.
       </p>
-      <TextareaInput value={prompt} onTextChange={(e) => setPrompt(e)} />
-
-      <button
-        onClick={handleGenerate}
-        disabled={isLoading}
-        className={styles.button}
-      >
+      <Button onClick={handleGenerate} disabled={isLoading}>
         {isLoading ? "Generating..." : "Generate Text"}
-      </button>
+      </Button>
 
-      <h3>Generated Output:</h3>
-      <div className={styles.resultBox}>{result}</div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Generated Output:</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm">{result}</p>
+        </CardContent>
+      </Card>
     </div>
   );
 };

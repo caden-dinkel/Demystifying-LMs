@@ -40,13 +40,5 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
 
   /* ... (Existing logic for searchTree, searchPath, handleNextToken, handlePrevNode) ... */
 
-  return (
-    <div className={styles.animationContainer} ref={containerRef}>
-      <D3TokenSearchTree
-        searchTree={searchTree}
-        searchPath={searchPath}
-        onNodeClick={handlePrevNode} // D3 handles the click and calls this React function
-      />
-    </div>
-  );
+  return <div></div>;
 };

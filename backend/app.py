@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api import lm_apis
+from src.api import lm_apis, planner_apis, chess_apis
 
 app = FastAPI()
 
@@ -19,3 +19,5 @@ app.add_middleware(
 )
 
 app.include_router(lm_apis.router)
+app.include_router(planner_apis.router)
+app.include_router(chess_apis.router)

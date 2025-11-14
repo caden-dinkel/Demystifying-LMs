@@ -1,42 +1,32 @@
 "use client";
 
-import { Button } from "../button";
-import { TextareaInput } from "../textBox";
+import { LMTextarea } from "../lmTextarea";
 import React, { useState, useCallback } from "react";
-import { TokenSearch } from "./userSearchTree";
+import { UserSearchTreeD3 } from "./userSearchTreeD3";
 
 export const StepTokenGen = () => {
-  const [inputText, setInputText] = useState("");
-
   const [submittedPrompt, setSubmittedPrompt] = useState<string | null>(null);
 
-  const handleStartSearch = useCallback(() => {
-    if (inputText.trim() === "") {
+  const handleStartSearch = useCallback((input: string, mode: string) => {
+    if (input.trim() === "") {
       alert("Please enter some text to begin the search tree.");
       return;
     }
 
     // Update the submitted prompt state, triggering the SearchTree to render
-    setSubmittedPrompt(inputText.trim());
-    console.log("Starting search tree with prompt:", inputText.trim());
-  }, [inputText]);
+    setSubmittedPrompt(input.trim());
+  }, []);
 
   // Use a boolean for cleaner JSX condition
   const isTreeReady = submittedPrompt !== null;
 
   return (
     <div>
-      <TextareaInput onTextChange={setInputText} value={inputText} />
-      <Button
-        onClick={handleStartSearch}
-        disabled={
-          inputText.trim() === "" ||
-          (isTreeReady && submittedPrompt === inputText.trim())
-        }
-      >
-        {isTreeReady ? "Restart Search Tree" : "Start Search Tree"}
-      </Button>
-      {isTreeReady && <TokenSearch initialPrompt={submittedPrompt} />}
+      <LMTextarea
+        onSend={handleStartSearch}
+        placeholder="Enter prompt to start search tree..."
+      />
+      {isTreeReady && <UserSearchTreeD3 initialPrompt={submittedPrompt} />}
     </div>
   );
 };

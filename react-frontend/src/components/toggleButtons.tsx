@@ -1,5 +1,5 @@
-import { Button } from "./button";
-import styles from "@/styles/toggle.module.css";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import React from "react";
 
 export interface ToggleOption {
@@ -21,15 +21,17 @@ export const ToggleButton = ({
   value,
 }: ToggleButtonProps) => {
   return (
-    <div className={styles.toggleGroup}>
+    <div className="flex items-center justify-center gap-0.5">
       {options.map((option) => (
         <Button
           key={option.key}
           disabled={option.blocked}
           onClick={() => onChange(option.key)}
-          className={
-            option.key === value ? styles.toggleSelected : styles.toggleNormal
-          }
+          variant={option.key === value ? "default" : "secondary"}
+          className={cn(
+            "transition-all",
+            option.key === value && "font-semibold"
+          )}
         >
           {option.icon ? option.icon : option.label}
         </Button>

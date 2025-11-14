@@ -1,5 +1,4 @@
 import React from "react";
-import styles from "@/styles/tokens.module.css"; // Assuming you keep bar styles here
 
 interface ProbBarProps {
   prob: number; // Probability from 0.0 to 1.0
@@ -11,8 +10,11 @@ export const ProbBar = ({ prob }: ProbBarProps) => {
   const fillWidth = `${safeProb * 100}%`;
 
   return (
-    <div className={styles.probBarContainer}>
-      <div className={styles.probBarFill} style={{ width: fillWidth }}></div>
+    <div className="w-full h-1.5 bg-border rounded-sm overflow-hidden">
+      <div
+        className="h-full bg-primary transition-all duration-300 ease-in-out"
+        style={{ width: fillWidth }}
+      />
     </div>
   );
 };

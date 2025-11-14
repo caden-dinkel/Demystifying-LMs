@@ -19,18 +19,23 @@ export const PromptDisplay = ({
     const container = containerRef.current;
     if (!container) return;
 
-    // OR, if the last token element itself is available:
-    const lastToken = container.lastElementChild;
-    lastToken?.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "end",
-    });
+    // Small delay to ensure DOM has updated
+    const timer = setTimeout(() => {
+      // OR, if the last token element itself is available:
+      const lastToken = container.lastElementChild;
+      lastToken?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "end",
+      });
 
-    // 2. CONTAINER RENDER CALLBACK (for SVG calculations)
-    const rect = container.getBoundingClientRect();
-    if (onContainerRender) onContainerRender(rect);
-  }, [currentTokens.length]);
+      // 2. CONTAINER RENDER CALLBACK (for SVG calculations)
+      const rect = container.getBoundingClientRect();
+      if (onContainerRender) onContainerRender(rect);
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [currentTokens, onContainerRender]); // Changed to trigger on any token change
   return (
     <div className={styles.promptDisplayWrapper}>
       <label className={styles.promptDisplayLabel}>Current Prompt</label>

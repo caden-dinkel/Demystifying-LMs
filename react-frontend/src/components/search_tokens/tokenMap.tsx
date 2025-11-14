@@ -43,6 +43,7 @@ export const TokenMap = React.memo(
             key={token.id}
             token={token.token}
             prob={token.prob}
+            token_id={token.token_id}
             onSelection={onSelection}
             onRender={handleChipRender}
             size="sm"

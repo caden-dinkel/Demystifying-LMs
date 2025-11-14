@@ -1,266 +1,155 @@
 //tokenSearching.tsx
 import styles from "@/styles/tokens.module.css";
 import React from "react";
-import { useRef, useState, useEffect, useCallback, useMemo } from "react";
-import { TreeNode, TokenData } from "@/utilities/types";
+import { useRef, useEffect, useCallback, useState } from "react";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { useLMSettings } from "@/components/settings/lmSettingsProvider";
+import { useConnectorLayout } from "./useConnectorLayout";
+import { SearchTreeProvider, useSearchTree } from "./useSearchTree";
 import { PromptDisplay } from "./promptDisplay";
 import { SearchTreeConnector } from "./treeBranches";
 import { TokenMap } from "./tokenMap";
+
 export interface TokenSearchProps {
   initialPrompt: string;
 }
 
-export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
-  // Keys for treenodes
-  const nextIdRef = useRef(0);
-  const getNextId = (): string => {
-    const newId = nextIdRef.current.toString();
-    nextIdRef.current += 1;
-    return newId;
-  };
+// Inner component that uses the context
+const TokenSearchContent = () => {
+  const { selectedLM } = useLMSettings();
+  const {
+    lhsBox,
+    rhsBoxes,
+    parentContainer,
+    handleLHSTokenRender,
+    handleRHSTokenRender,
+    setParentContainer,
+  } = useConnectorLayout();
 
-  const { modelName } = useLMSettings();
-  // --- State Initialization (SSoT) ---
-  // Data to know values of lhs and rhs tokens
-  // Key of each node refers to id of last lhs token
-  const [searchTree, setSearchTree] = useState<Map<string, TreeNode>>(
-    new Map()
+  const {
+    lhsTokenData,
+    rhsTokenData,
+    searchPath,
+    searchTree,
+    addChildrenToNode,
+    selectNode,
+    deselectNode,
+    moveToNode,
+    navigateBack,
+    setAnimationData,
+    buildPromptFromPath,
+    getNodeById,
+  } = useSearchTree();
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [animatingTokenIndex, setAnimatingTokenIndex] = useState<number | null>(
+    null
   );
 
-  const [animationData, setAnimationData] = useState<{
-    startCoords: DOMRect;
-    endId: string;
-  } | null>(null);
-
-  // Stores current string of tokens that form the search path.
-  const [searchPath, setSearchPath] = useState<string[]>([]);
-
-  const [lhsRect, setLhsRect] = useState<DOMRect | null>(null);
-  const [rhsRects, setRhsRects] = useState<DOMRect[]>([]);
-
-  // Reset state when initialPrompt changes
+  // Update parent container rect when component mounts or layout changes
   useEffect(() => {
-    if (!initialPrompt) {
-      setSearchTree(new Map());
-      setSearchPath([]);
-      setAnimationData(null);
-      setLhsRect(null);
-      setRhsRects([]);
-      nextIdRef.current = 0; // Reset ID counter
-      return;
-    }
+    const container = containerRef.current;
+    if (!container) return;
 
-    const rootNode: TreeNode = {
-      id: "initial",
-      token: initialPrompt,
-      prob: 1,
-      parentNodeId: null,
-      childrenNodeIds: [],
-      isSelected: true,
+    const updateRect = () => {
+      const rect = container.getBoundingClientRect();
+      setParentContainer(rect);
     };
-    setSearchTree(new Map([[rootNode.id, rootNode]]));
-    setSearchPath(["initial"]);
-    setAnimationData(null);
-    setLhsRect(null);
-    setRhsRects([]);
-    nextIdRef.current = 0; // Reset ID counter
 
-    // Fetch children for the root node
-    const fetchInitialChildren = async () => {
+    updateRect();
+
+    // Update on resize or when tokens change
+    window.addEventListener("resize", updateRect);
+    return () => window.removeEventListener("resize", updateRect);
+  }, [setParentContainer, lhsTokenData.length, rhsTokenData.length]);
+
+  // Handler for clicking a token on the rhs (USER-DRIVEN API CALL)
+  const handleNextToken = useCallback(
+    async (selectedId: string, startCoords: DOMRect) => {
+      const currentPathEndId = searchPath[searchPath.length - 1];
+      setAnimationData({ startCoords, endId: selectedId });
+
+      // Get the selected token
+      const selectedNode = getNodeById(selectedId);
+      if (!selectedNode) return;
+
+      // Find the index of the selected token in rhsTokenData
+      const tokenIndex = rhsTokenData.findIndex(
+        (token) => token.id === selectedId
+      );
+
+      // Start animation
+      setAnimatingTokenIndex(tokenIndex);
+
+      // Wait for animation delay (500ms)
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Stop animation
+      setAnimatingTokenIndex(null);
+
+      // Build prompt for API
+      const promptForApi = buildPromptFromPath() + selectedNode.token;
+
       try {
-        const data = await getTokenProbabilities(initialPrompt, modelName);
-        const normalizedProbs = normalizeProbabilities(data.probabilities);
-        setSearchTree((prevTree) => {
-          const newTree = new Map(prevTree);
-          const rootNode = newTree.get("initial");
-          if (!rootNode) return prevTree;
+        // USER-SPECIFIC: Make API call based on user selection
+        const data = await getTokenProbabilities(promptForApi, selectedLM);
 
-          const newChildrenIds = data.tokens.map(() => getNextId());
+        // Deselect previous node
+        deselectNode(currentPathEndId);
 
-          // 1. Update Root Node with Children IDs
-          newTree.set("initial", {
-            ...rootNode,
-            childrenNodeIds: newChildrenIds,
-          });
+        // Select new node
+        selectNode(selectedId);
 
-          // 2. Add New Child Nodes
-          data.tokens.forEach((token, index) => {
-            newTree.set(newChildrenIds[index], {
-              id: newChildrenIds[index],
-              token: token,
-              prob: normalizedProbs[index],
-              parentNodeId: "initial",
-              childrenNodeIds: [],
-              isSelected: false,
-            });
-          });
-          return newTree;
-        });
+        // Add children to the newly selected node
+        addChildrenToNode(
+          selectedId,
+          data.tokens,
+          data.probabilities,
+          data.token_ids
+        );
+
+        // Update path
+        moveToNode(selectedId);
       } catch (error) {
-        console.error("Error fetching initial tokens:", error);
+        console.error("Error fetching data:", error);
+        setAnimatingTokenIndex(null);
       }
-    };
-
-    fetchInitialChildren();
-  }, [initialPrompt, modelName]);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const parentRect = containerRef.current?.getBoundingClientRect() ?? null;
-
-  // Helper function to normalize token probabilities
-  const normalizeProbabilities = (probabilities: number[]): number[] => {
-    const sum = probabilities.reduce((acc, prob) => acc + prob, 0);
-    if (sum === 0) return probabilities.map(() => 0);
-    return probabilities.map((prob) => prob / sum);
-  };
-
-  // Handler for clicking a token on the rhs.
-  const handleNextToken = async (selectedId: string, startCoords: DOMRect) => {
-    const currentPathEndId = searchPath[searchPath.length - 1];
-    setAnimationData({ startCoords, endId: selectedId });
-    // Get prompt (using current path end ID for prompt construction)
-    const promptTokens = searchPath
-      .map((id) => searchTree.get(id)?.token)
-      .filter((t): t is string => t !== undefined)
-      .join("");
-    const selectedToken = searchTree.get(selectedId)?.token ?? "";
-    const promptForApi = promptTokens + selectedToken;
-
-    // Fetch New Tokens and update all state atomically
-    try {
-      const data = await getTokenProbabilities(promptForApi, modelName);
-      const normalizedProbs = normalizeProbabilities(data.probabilities);
-      const newChildrenIds = data.tokens.map(() => getNextId());
-
-      console.log("Fetched Data for Prompt:", promptForApi);
-
-      setSearchTree((prevTree) => {
-        const newTree = new Map(prevTree);
-
-        // 1. Deselect previous node
-        const prevNode = newTree.get(currentPathEndId);
-        if (prevNode)
-          newTree.set(currentPathEndId, { ...prevNode, isSelected: false });
-
-        // 2. Select new node and set its children
-        const newNode = newTree.get(selectedId);
-        if (newNode) {
-          newTree.set(selectedId, {
-            ...newNode,
-            isSelected: true,
-            childrenNodeIds: newChildrenIds,
-          });
-        }
-
-        // 3. Add the new child nodes
-        data.tokens.forEach((token, index) => {
-          newTree.set(newChildrenIds[index], {
-            id: newChildrenIds[index],
-            token: token,
-            prob: normalizedProbs[index],
-            parentNodeId: selectedId,
-            childrenNodeIds: [],
-            isSelected: false,
-          });
-        });
-
-        return newTree;
-      });
-
-      // Update path after tree is updated (for consistency)
-      setSearchPath((prevPath) => [...prevPath, selectedId]);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+    },
+    [
+      searchPath,
+      selectedLM,
+      rhsTokenData,
+      setAnimationData,
+      buildPromptFromPath,
+      getNodeById,
+      deselectNode,
+      selectNode,
+      addChildrenToNode,
+      moveToNode,
+    ]
+  );
 
   const handlePrevNode = useCallback(
     (selectedNodeID: string) => {
-      setSearchPath((prevPath) => {
-        const selectedIndex = prevPath.findIndex((id) => id === selectedNodeID);
-        if (selectedIndex !== -1) {
-          const newPath = prevPath.slice(0, selectedIndex + 1);
-
-          // Update the isSelected flags for visual consistency
-          setSearchTree((prevTree) => {
-            const newTree = new Map(prevTree);
-
-            // Deselect nodes that were truncated from the path
-            prevPath.slice(selectedIndex + 1).forEach((idToDeselect) => {
-              const node = newTree.get(idToDeselect);
-              if (node)
-                newTree.set(idToDeselect, { ...node, isSelected: false });
-            });
-
-            // Select the new end of the path
-            const newEndNode = newTree.get(selectedNodeID);
-            if (newEndNode)
-              newTree.set(selectedNodeID, { ...newEndNode, isSelected: true });
-
-            return newTree;
-          });
-
-          return newPath;
-        }
-        return prevPath;
-      });
+      navigateBack(selectedNodeID);
     },
-    [setSearchTree]
+    [navigateBack]
   );
 
-  // Handle rendering of TokenChips
-  const handleLHSTokenRender = useCallback((rect: DOMRect) => {
-    setLhsRect(rect);
-  }, []);
-
-  const handleRHSTokenRender = useCallback((rects: DOMRect[]) => {
-    setRhsRects(rects);
-  }, []);
-
-  // --- Derived State (Calculated in Render) ---
-
-  // Data to know where to draw svg paths
-  const connectorsData = useMemo(() => {
-    if (!lhsRect || !rhsRects.length) return null;
-
-    return {
-      lhsBox: lhsRect,
-      rhsBoxes: rhsRects,
-    };
-  }, [lhsRect, rhsRects]);
-
-  const lastId = searchPath[searchPath.length - 1];
-
-  // Tokens for the LHS (PromptDisplay)
-  const lhsTokenData: TokenData[] =
-    searchPath
-      .map((id) => searchTree.get(id))
-      .filter((node): node is TreeNode => node !== undefined)
-      .map((node) => ({ id: node.id, token: node.token, prob: node.prob })) ??
-    [];
-
-  // Tokens for the RHS (TokenMap)
-  const rhsTokenData: TokenData[] =
-    searchTree
-      .get(lastId)
-      ?.childrenNodeIds // Get the IDs of the current node's children
-      .map((id) => searchTree.get(id))
-      .filter((node): node is TreeNode => node !== undefined)
-      .map((node) => ({ id: node.id, token: node.token, prob: node.prob })) ??
-    [];
-
   return (
-    <div className={styles.animationContainer} ref={containerRef}>
+    <div
+      className={styles.animationContainer}
+      ref={containerRef}
+      data-search-tree-container
+    >
       <div className={styles.contentContainer}>
         <div className={styles.lhsContainer}>
-          {rhsRects.length > 0 && (
+          {rhsBoxes.length > 0 && (
             <PromptDisplay
               currentTokens={lhsTokenData}
               onNodeClick={handlePrevNode}
               onContainerRender={handleLHSTokenRender}
-            ></PromptDisplay>
+            />
           )}
         </div>
         <div className={styles.rhsContainer}>
@@ -269,17 +158,49 @@ export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
               tokenData={rhsTokenData}
               onSelection={handleNextToken}
               onRender={handleRHSTokenRender}
-            ></TokenMap>
+            />
           </div>
         </div>
       </div>
-      {connectorsData !== null && (
+      {lhsBox && rhsBoxes.length > 0 && parentContainer && (
         <SearchTreeConnector
-          lhsBox={connectorsData.lhsBox}
-          rhsBoxes={connectorsData.rhsBoxes}
-          parentRect={parentRect}
-        ></SearchTreeConnector>
+          lhsBox={lhsBox}
+          rhsBoxes={rhsBoxes}
+          parentRect={parentContainer}
+          animatingTokenIndex={animatingTokenIndex}
+        />
       )}
     </div>
+  );
+};
+
+// Wrapper component that provides the context
+export const TokenSearch = ({ initialPrompt }: TokenSearchProps) => {
+  const { selectedLM } = useLMSettings();
+
+  // Handler for initial API call when tree is initialized
+  const handleInitialize = useCallback(
+    async (
+      prompt: string,
+      addChildren: (tokens: string[], probabilities: number[]) => void
+    ) => {
+      try {
+        const data = await getTokenProbabilities(prompt, selectedLM);
+        // Call the provided callback to add children to the root node
+        addChildren(data.tokens, data.probabilities);
+      } catch (error) {
+        console.error("Error fetching initial tokens:", error);
+      }
+    },
+    [selectedLM]
+  );
+
+  return (
+    <SearchTreeProvider
+      initialPrompt={initialPrompt}
+      onInitialize={handleInitialize}
+    >
+      <TokenSearchContent />
+    </SearchTreeProvider>
   );
 };

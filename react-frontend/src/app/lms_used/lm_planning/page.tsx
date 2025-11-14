@@ -13,7 +13,7 @@ export default function LM_Planning() {
 
       {/* 2. Main Content (The unique part of this page) */}
       <main className={styles.baseMain}>
-        {/* LM Planning Component */}
+        {/* LM Planning Component - Smart home */}
         Future component for planning with LLMs will go here.
       </main>
     </>

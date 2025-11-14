@@ -37,9 +37,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <LMSettingsProvider>
-            {children}
-          </LMSettingsProvider>
+          <LMSettingsProvider>{children}</LMSettingsProvider>
         </ThemeProvider>
       </body>
     </html>
