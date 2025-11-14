@@ -1,37 +1,29 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import Navbar from "@/components/navigation/navBar";
-import { LMTextarea } from "@/components/lmTextarea";
-import { TokenSearch } from "@/components/search_tokens/userSearchTree";
-import { ConnectorLayoutProvider } from "@/components/search_tokens/useConnectorLayout";
+import styles from "@/styles/main-layout.module.css";
 
 export default function SequentialGeneration() {
-  const [prompt, setPrompt] = useState<string>("");
-  const [showTree, setShowTree] = useState<boolean>(false);
-
-  const handleStartSearch = useCallback((userPrompt: string) => {
-    setPrompt(userPrompt);
-    setShowTree(true);
-  }, []);
-
   return (
     <div>
       <Navbar />
-      <div
-        style={{
-          marginLeft: "1rem",
-          marginTop: "1rem",
-          width: "calc(100vw - 2rem)",
-        }}
-      >
-        <LMTextarea onSend={handleStartSearch} />
-        {showTree && (
-          <ConnectorLayoutProvider>
-            <TokenSearch initialPrompt={prompt} />
-          </ConnectorLayoutProvider>
-        )}
-      </div>
+      <main className={styles.baseMain}>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold tracking-tight mb-2">
+            Sequential Generation
+          </h1>
+          <p className="text-muted-foreground mb-4">
+            Future implementation: This page will demonstrate sequential text
+            generation, showing how language models build outputs token by token
+            in sequence.
+          </p>
+          <div className="p-6 border rounded-lg bg-muted/50">
+            <p className="text-sm text-muted-foreground italic">
+              🚧 Coming soon: Interactive sequential generation visualization
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

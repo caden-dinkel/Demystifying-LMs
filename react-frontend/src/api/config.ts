@@ -4,7 +4,9 @@ export const LLAMA_LM = "Llama-3.2";
 
 export const GPT_LM = "GPT-2";
 
-export const AVAILABLE_LMS = [GPT_LM, LLAMA_LM];
+export const CHESS_LLAMA_LM = "Chess-Llama";
+
+export const AVAILABLE_LMS = [GPT_LM, LLAMA_LM, CHESS_LLAMA_LM];
 export const DEFAULT_LM = GPT_LM;
 
 export const GREEDY_SEARCH = "Greedy";

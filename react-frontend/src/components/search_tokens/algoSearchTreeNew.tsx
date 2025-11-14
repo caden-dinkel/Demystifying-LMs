@@ -8,6 +8,7 @@ import { SearchTreeProvider, useSearchTree } from "./useSearchTree";
 import { PromptDisplay } from "./promptDisplay";
 import { SearchTreeConnector } from "./treeBranches";
 import { TokenMap } from "./tokenMap";
+import { GeneratedTextBox } from "./generatedTextBox";
 import { Button } from "@/components/ui/button";
 import {
   PlayIcon,
@@ -307,6 +308,9 @@ const AlgoSearchTreeNewContent = ({
       ref={containerRef}
       data-search-tree-container
     >
+      {/* Draggable Generated Text Box */}
+      <GeneratedTextBox text={currentPrompt} />
+
       {renderControls &&
         stepsData.length > 0 &&
         renderControls({

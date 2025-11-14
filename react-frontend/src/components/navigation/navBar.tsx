@@ -29,13 +29,8 @@ const WorkNavLinks: NavLink[] = [
   { name: "Tokenizing Text", href: "/lms_work/encode_tokens" },
   { name: "Predicting Next Word", href: "/lms_work/predict_next" },
   { name: "Searching for Words", href: "/lms_work/decode_tokens" },
+  { name: "Searching for Words (D3)", href: "/lms_work/decode_tokens_d3" },
   { name: "Sequential Generation", href: "/lms_work/sequential_generation" },
-  {
-    name: "Sequential Generation (d3)",
-    href: "/lms_work/sequential_generation_d3",
-  },
-  { name: "Algorithm Search Tree", href: "/lms_work/algo_search" },
-  { name: "Algorithm Search Tree (d3)", href: "/lms_work/algo_search_d3" },
 ];
 
 const UsedNavLinks: NavLink[] = [
@@ -63,7 +58,7 @@ const NavItems: NavItem[] = [
 const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between px-4">
+      <div className="flex h-14 items-center justify-between px-4 w-full">
         <NavigationMenu>
           <NavigationMenuList>
             {NavItems.map((link) => {

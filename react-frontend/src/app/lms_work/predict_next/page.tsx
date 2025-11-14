@@ -12,8 +12,20 @@ export default function PredictNext() {
 
       {/* 2. Main Content (The unique part of this page) */}
       <main className={styles.baseMain}>
-        {/* Markov Token Prediction Component */}
-        Future component for predicting the next word will go here.
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold tracking-tight mb-2">
+            Predict Next Token
+          </h1>
+          <p className="text-muted-foreground mb-4">
+            Future implementation: This page will demonstrate how language
+            models predict the next token given a sequence of input tokens.
+          </p>
+          <div className="p-6 border rounded-lg bg-muted/50">
+            <p className="text-sm text-muted-foreground italic">
+              🚧 Coming soon: Interactive next token prediction visualization
+            </p>
+          </div>
+        </div>
       </main>
     </>
   );

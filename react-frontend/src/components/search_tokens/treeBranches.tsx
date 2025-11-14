@@ -1,3 +1,5 @@
+import styles from "../../styles/search-tree.module.css";
+
 export interface SearchTreeConnectorProps {
   rhsBoxes: DOMRect[];
   lhsBox: DOMRect;
@@ -77,52 +79,26 @@ export const SearchTreeConnector = ({
       <path
         key={`spoke-${index}`}
         d={curvedPath}
-        stroke="var(--connector-color)"
-        strokeWidth={isAnimating ? "3" : "2"}
-        fill="none"
-        style={
-          isAnimating
-            ? {
-                strokeDasharray: "10 5",
-                animation: "dash 0.5s linear infinite",
-                stroke: "var(--accent-color, #3b82f6)",
-              }
-            : undefined
-        }
+        className={isAnimating ? styles.spokePathAnimating : styles.spokePath}
       />
     );
   });
 
   return (
     <svg
+      className={styles.connectorSvg}
       style={{
-        position: "absolute",
         top: svgTop,
         left: svgLeft,
         width: svgWidth,
         height: svgHeight,
-        pointerEvents: "none",
-        overflow: "visible",
-        zIndex: 1,
       }}
     >
       {/* Main line from prompt to hub */}
-      <path
-        d={mainPath}
-        stroke="var(--connector-color)"
-        strokeWidth="2"
-        fill="none"
-      />
+      <path d={mainPath} className={styles.mainPath} />
 
       {/* Hub circle */}
-      <circle
-        cx={hubX}
-        cy={hubY}
-        r={hubRadius}
-        fill="var(--connector-color)"
-        stroke="var(--connector-color)"
-        strokeWidth="1"
-      />
+      <circle cx={hubX} cy={hubY} r={hubRadius} className={styles.hubCircle} />
 
       {/* Spokes from hub to tokens */}
       {spokePaths}

@@ -12,6 +12,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@radix-ui/react-icons";
+import styles from "../../styles/search-tree.module.css";
 
 export interface AlgoSearchTreeD3Props {
   initialPrompt: string;
@@ -41,6 +42,7 @@ interface D3Node {
   isSelected?: boolean;
   isAnimating?: boolean;
   shouldShow?: boolean; // Whether this node should be visible
+  isPrevious?: boolean; // Whether this is a previous step node (reduced opacity)
 }
 
 const AlgoSearchTreeD3Content = ({
@@ -272,7 +274,7 @@ const AlgoSearchTreeD3Content = ({
     }
   }, [stepsData.length, isPlaying, fetchIterativeGeneration]);
 
-  // Convert searchTree to D3 hierarchy - keep all nodes but mark which to show
+  // Convert searchTree to D3 hierarchy - keep all nodes visible with different states
   const buildD3Tree = useCallback((): D3Node | null => {
     if (searchPath.length === 0) return null;
 
@@ -298,30 +300,34 @@ const AlgoSearchTreeD3Content = ({
         y: 0,
         isSelected: node.isSelected,
         isAnimating: animatingNodeId === node.id,
-        shouldShow: isInPath || (isCurrentNode && hasChildren),
+        shouldShow: true, // Always show nodes
+        isPrevious: isInPath && !isCurrentNode, // Mark previous nodes in path
       };
 
-      // Always include children in structure, but mark visibility
+      // Always include children in structure
       if (hasChildren) {
         if (isCurrentNode) {
-          // Current node: show all children
+          // Current node: show all children at full opacity
           d3Node.children = node.childrenNodeIds
             .map((childId) => {
               const childNode = buildNode(childId, depth + 1);
               if (childNode) {
                 childNode.shouldShow = true;
+                childNode.isPrevious = false;
               }
               return childNode;
             })
             .filter((n): n is D3Node => n !== null);
         } else if (isInPath && depth < searchPath.length - 1) {
-          // Path node: include all children but only show the next in path
+          // Path node: include all children and show them all (at reduced opacity)
           const nextNodeId = searchPath[depth + 1];
           d3Node.children = node.childrenNodeIds
             .map((childId) => {
               const childNode = buildNode(childId, depth + 1);
               if (childNode) {
-                childNode.shouldShow = childId === nextNodeId;
+                childNode.shouldShow = true;
+                // Mark non-selected children as previous
+                childNode.isPrevious = childId !== nextNodeId;
               }
               return childNode;
             })
@@ -460,10 +466,13 @@ const AlgoSearchTreeD3Content = ({
           .x((d) => d.y)
           .y((d) => d.x)
       )
-      .style("opacity", (d) => (d.target.data.shouldShow ? 0 : 0))
+      .style("opacity", 0)
       .transition()
       .duration(500)
-      .style("opacity", (d) => (d.target.data.shouldShow ? 1 : 0));
+      .style("opacity", (d) => {
+        if (d.target.data.isPrevious) return 0.3; // Reduced opacity for previous
+        return d.target.data.shouldShow ? 1 : 0;
+      });
 
     // Draw nodes
     const nodes = g
@@ -495,10 +504,13 @@ const AlgoSearchTreeD3Content = ({
         return "#cbd5e1";
       })
       .attr("stroke-width", (d) => (d.data.isAnimating ? 3 : 2))
-      .style("opacity", (d) => (d.data.shouldShow ? 0 : 0))
+      .style("opacity", 0)
       .transition()
       .duration(500)
-      .style("opacity", (d) => (d.data.shouldShow ? 1 : 0));
+      .style("opacity", (d) => {
+        if (d.data.isPrevious) return 0.4; // Reduced opacity for previous
+        return d.data.shouldShow ? 1 : 0;
+      });
 
     // Add token text
     nodes
@@ -508,12 +520,15 @@ const AlgoSearchTreeD3Content = ({
       .attr("font-size", "13px")
       .attr("font-weight", (d) => (d.data.isSelected ? "600" : "500"))
       .attr("fill", "#1e293b")
-      .style("opacity", (d) => (d.data.shouldShow ? 0 : 0))
+      .style("opacity", 0)
       .text((d) => d.data.token)
       .style("pointer-events", "none")
       .transition()
       .duration(500)
-      .style("opacity", (d) => (d.data.shouldShow ? 1 : 0));
+      .style("opacity", (d) => {
+        if (d.data.isPrevious) return 0.4; // Reduced opacity for previous
+        return d.data.shouldShow ? 1 : 0;
+      });
 
     // Add probability text
     nodes
@@ -523,12 +538,15 @@ const AlgoSearchTreeD3Content = ({
       .attr("font-size", "10px")
       .attr("font-weight", "500")
       .attr("fill", "#64748b")
-      .style("opacity", (d) => (d.data.shouldShow ? 0 : 0))
+      .style("opacity", 0)
       .text((d) => `${(d.data.prob * 100).toFixed(1)}%`)
       .style("pointer-events", "none")
       .transition()
       .duration(500)
-      .style("opacity", (d) => (d.data.shouldShow ? 1 : 0));
+      .style("opacity", (d) => {
+        if (d.data.isPrevious) return 0.4; // Reduced opacity for previous
+        return d.data.shouldShow ? 1 : 0;
+      });
 
     // Add probability bar below each node
     const barWidth = 80;
@@ -543,10 +561,13 @@ const AlgoSearchTreeD3Content = ({
       .attr("height", barHeight)
       .attr("rx", 2)
       .attr("fill", "#e5e7eb")
-      .style("opacity", (d) => (d.data.shouldShow ? 0 : 0))
+      .style("opacity", 0)
       .transition()
       .duration(500)
-      .style("opacity", (d) => (d.data.shouldShow ? 1 : 0));
+      .style("opacity", (d) => {
+        if (d.data.isPrevious) return 0.3;
+        return d.data.shouldShow ? 1 : 0;
+      });
 
     nodes
       .append("rect")
@@ -560,10 +581,13 @@ const AlgoSearchTreeD3Content = ({
         if (d.data.isSelected) return "#3b82f6";
         return "#60a5fa";
       })
-      .style("opacity", (d) => (d.data.shouldShow ? 0 : 0))
+      .style("opacity", 0)
       .transition()
       .duration(500)
-      .style("opacity", (d) => (d.data.shouldShow ? 1 : 0));
+      .style("opacity", (d) => {
+        if (d.data.isPrevious) return 0.3;
+        return d.data.shouldShow ? 1 : 0;
+      });
 
     // Draw prompt path
     const promptTokens = searchPath
@@ -706,48 +730,19 @@ const AlgoSearchTreeD3Content = ({
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   return (
-    <div style={{ width: "100%", minHeight: "600px", position: "relative" }}>
+    <div className={styles.d3Container}>
       {/* Draggable Generated Text Box */}
       <div
+        className={styles.textBox}
         style={{
-          position: "absolute",
           left: `${textBoxPosition.x}px`,
           top: `${textBoxPosition.y}px`,
-          backgroundColor: "white",
-          border: "1px solid #e5e7eb",
-          borderRadius: "8px",
-          padding: "1rem",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-          zIndex: 1000,
-          minWidth: "300px",
-          maxWidth: "500px",
           cursor: isDragging ? "grabbing" : "grab",
         }}
         onMouseDown={handleMouseDown}
       >
-        <div
-          style={{
-            fontWeight: "600",
-            fontSize: "0.875rem",
-            color: "#374151",
-            marginBottom: "0.5rem",
-            userSelect: "none",
-          }}
-        >
-          Generated Text
-        </div>
-        <div
-          style={{
-            fontFamily: "monospace",
-            fontSize: "0.875rem",
-            color: "#111827",
-            lineHeight: "1.5",
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-          }}
-        >
-          {currentPrompt}
-        </div>
+        <div className={styles.textBoxTitle}>Generated Text</div>
+        <div className={styles.textBoxContent}>{currentPrompt}</div>
       </div>
       {renderControls &&
         stepsData.length > 0 &&
@@ -762,17 +757,12 @@ const AlgoSearchTreeD3Content = ({
           totalSteps: stepsData.length,
           isProcessingStep,
         })}
-      <div style={{ width: "100%", height: "600px", overflow: "auto" }}>
+      <div className={styles.svgContainer}>
         <svg
           ref={svgRef}
           width={dimensions.width}
           height={dimensions.height}
-          style={{
-            border: "1px solid #e2e8f0",
-            borderRadius: "8px",
-            minWidth: "100%",
-            minHeight: "100%",
-          }}
+          className={styles.svgCanvas}
         />
       </div>
     </div>

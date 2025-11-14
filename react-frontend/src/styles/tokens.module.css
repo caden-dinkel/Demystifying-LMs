@@ -29,8 +29,9 @@
 }
 
 .tokenRHS {
-  width: 100px;
-  height: 25px;
+  width: 80px;
+  height: 20px;
+  font-size: 0.75rem;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -41,6 +42,7 @@
   width: 100%;
   position: relative;
   display: flex;
+  aspect-ratio: 2 / 1;
 }
 
 /* Defined Initially for Mobile */
@@ -61,8 +63,8 @@
   display: flex;
   flex-wrap: wrap;
   height: 100%;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start; /* Align to left */
+  align-items: center; /* Center vertically with RHS tokens */
   gap: 8px;
 }
 
@@ -114,6 +116,7 @@
   gap: 8px;
   max-width: 300px;
   width: 100%;
+  align-self: center; /* Center within parent flex container */
 }
 
 .promptDisplayLabel {
@@ -141,7 +144,7 @@
 
 .tokenMapItem {
   /* Make each item stretch across the container */
-  width: 150px;
+  width: 100px;
   display: flex; /* Use Flexbox to separate Token and Probability */
   justify-content: space-between;
   align-items: center;
@@ -168,30 +171,35 @@
   }
 
   .lhsContainer {
-    justify-content: center;
+    justify-content: flex-start; /* Align to left */
     flex: 1;
     max-height: 100%;
     align-items: center;
+    padding-left: 16px;
   }
 
   .rhsContainer {
+    display: flex;
     justify-content: center;
-    flex: 1;
     align-items: center;
+    flex: 1;
     margin-top: 0;
   }
 
   .tokenMapContainer {
     /* Switch to a true Grid layout for visual organization */
-    display: grid;
-    float: right;
+    display: flex;
+    flex-direction: column;
     gap: 4px;
+    align-items: center;
+    width: 300px; /* Don't stretch to full width */
+    max-width: 300px; /* Limit the width */
   }
 
   .tokenMapItem {
     /* Each item is a card in the grid */
     flex-direction: row; /* Stack content within the card */
-    justify-content: flex-start flex-end;
+    justify-content: flex-start;
   }
 
   .probBarFill {
@@ -207,7 +215,7 @@
 
   .probBarContainer {
     /* Set maximum size relative to the card/tokenMapItem */
-    width: 150px; /* Take up most of the available width */
+    width: 100px; /* Take up most of the available width */
     height: 6px; /* Fixed height for visual consistency */
 
     /* Background representing the 100% boundary */

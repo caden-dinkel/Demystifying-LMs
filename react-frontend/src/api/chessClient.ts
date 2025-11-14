@@ -3,6 +3,8 @@ import { API_BASE_URL } from "./config";
 
 export interface ChessMoveResponse {
   move: string;
+  prompt?: string;
+  response?: string;
 }
 
 export interface PossibleMovesResponse {
@@ -25,21 +27,24 @@ export interface ApplyMoveResponse {
  * Requests the LM to make a move for the given board position
  * @param fen - Current board position in FEN notation
  * @param modelName - Name of the LM model to use
- * @returns The LM's chosen move in UCI format (e.g., "e2e4")
+ * @param moveHistory - Optional array of previous moves in UCI format
+ * @returns The LM's chosen move in UCI format along with prompt and response
  */
 export const getLMMove = async (
   fen: string,
-  modelName: string
-): Promise<string> => {
+  modelName: string,
+  moveHistory: string[] = []
+): Promise<ChessMoveResponse> => {
   try {
     const response = await axios.post<ChessMoveResponse>(
       `${API_BASE_URL}chess/make_move`,
       {
         fen,
         model_name: modelName,
+        move_history: moveHistory,
       }
     );
-    return response.data.move;
+    return response.data;
   } catch (error) {
     console.error("Error getting LM move:", error);
     throw error;

@@ -26,7 +26,6 @@ export interface Room {
   id: string;
   targetTemp: number;
   currentTemp: number;
-  lightOn: boolean;
   hvacMode: "heat" | "cool" | "off";
 }
 
@@ -41,8 +40,8 @@ export interface Person {
   location: string;
   name: string;
   preferredTemp: number;
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
   comfortable: boolean;
   waypoints?: Waypoint[]; // Path for person to follow
   currentWaypointIndex?: number; // Which waypoint they're heading to

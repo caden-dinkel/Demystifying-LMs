@@ -13,8 +13,21 @@ export default function LMPromptEngineering() {
 
       {/* 2. Main Content (The unique part of this page) */}
       <main className={styles.baseMain}>
-        {/* Prompt Engineering Component */}
-        Show how manipulating the prompt changes the LLM output.
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold tracking-tight mb-2">
+            Prompt Engineering
+          </h1>
+          <p className="text-muted-foreground mb-4">
+            Future implementation: This page will demonstrate how manipulating
+            the prompt affects language model output and behavior.
+          </p>
+          <div className="p-6 border rounded-lg bg-muted/50">
+            <p className="text-sm text-muted-foreground italic">
+              🚧 Coming soon: Interactive prompt engineering examples and
+              experiments
+            </p>
+          </div>
+        </div>
       </main>
     </>
   );

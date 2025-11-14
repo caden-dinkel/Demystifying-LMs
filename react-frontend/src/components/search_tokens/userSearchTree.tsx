@@ -9,6 +9,7 @@ import { SearchTreeProvider, useSearchTree } from "./useSearchTree";
 import { PromptDisplay } from "./promptDisplay";
 import { SearchTreeConnector } from "./treeBranches";
 import { TokenMap } from "./tokenMap";
+import { GeneratedTextBox } from "./generatedTextBox";
 
 export interface TokenSearchProps {
   initialPrompt: string;
@@ -142,6 +143,9 @@ const TokenSearchContent = () => {
       ref={containerRef}
       data-search-tree-container
     >
+      {/* Draggable Generated Text Box */}
+      <GeneratedTextBox text={buildPromptFromPath()} />
+
       <div className={styles.contentContainer}>
         <div className={styles.lhsContainer}>
           {rhsBoxes.length > 0 && (

@@ -4,67 +4,91 @@ export interface DrawPersonProps {
   person: Person;
   x: number;
   y: number;
+  onDragStart?: (person: Person, event: React.MouseEvent) => void;
 }
 
-export const DrawPerson = ({ person, x, y }: DrawPersonProps) => {
-  // Color based on comfort level
-  const comfortColor = person.comfortable ? "#4CAF50" : "#F44336";
-  const pulseAnimation = person.comfortable ? "none" : "pulse";
+export const DrawPerson = ({ person, x, y, onDragStart }: DrawPersonProps) => {
+  // Color based on comfort level - using global CSS colors
+  const comfortColor = person.comfortable
+    ? "hsl(var(--chart-2))"
+    : "hsl(var(--destructive))";
 
   return (
-    <g>
-      {/* Person circle */}
-      <circle
+    <g
+      opacity="0.6"
+      style={{ cursor: "grab" }}
+      onMouseDown={(e) => onDragStart?.(person, e as any)}
+    >
+      {/* Person shadow silhouette */}
+      <ellipse
         cx={x}
         cy={y}
-        r="15"
+        rx="35"
+        ry="15"
         fill={comfortColor}
-        stroke="#333"
+        stroke="hsl(var(--border))"
         strokeWidth="2"
-        opacity="0.9"
       >
         {!person.comfortable && (
           <animate
-            attributeName="r"
-            values="15;18;15"
+            attributeName="opacity"
+            values="0.6;0.8;0.6"
             dur="1.5s"
             repeatCount="indefinite"
           />
         )}
-      </circle>
+      </ellipse>
 
-      {/* Person initial */}
+      {/* Person head (part of shadow) */}
+      <circle
+        cx={x}
+        cy={y - 20}
+        r="18"
+        fill={comfortColor}
+        stroke="hsl(var(--border))"
+        strokeWidth="2"
+      />
+
+      {/* Person initial in the head */}
       <text
         x={x}
-        y={y + 5}
+        y={y - 15}
         textAnchor="middle"
-        fill="white"
-        fontSize="16"
+        fill="hsl(var(--background))"
+        fontSize="20"
         fontWeight="bold"
       >
         {person.name.charAt(0).toUpperCase()}
       </text>
 
-      {/* Name label */}
+      {/* Name label to the left of icon */}
       <text
-        x={x}
-        y={y + 30}
-        textAnchor="middle"
-        fill="#333"
-        fontSize="12"
+        x={x - 50}
+        y={y - 10}
+        textAnchor="end"
+        fill="#000000"
+        fontSize="18"
         fontWeight="bold"
+        stroke="#000000"
+        strokeWidth="0.3"
       >
         {person.name}
       </text>
 
-      {/* Preferred temperature tooltip */}
-      <text x={x} y={y + 45} textAnchor="middle" fill="#666" fontSize="10">
+      {/* Preferred temperature tooltip next to name */}
+      <text x={x - 50} y={y + 8} textAnchor="end" fill="#333333" fontSize="14">
         Prefers {person.preferredTemp}°F
       </text>
 
       {/* Comfort indicator */}
       {!person.comfortable && (
-        <text x={x} y={y - 25} textAnchor="middle" fill="#F44336" fontSize="18">
+        <text
+          x={x}
+          y={y - 45}
+          textAnchor="middle"
+          fill="hsl(var(--destructive))"
+          fontSize="24"
+        >
           ⚠️
         </text>
       )}

@@ -47,52 +47,41 @@ export const DrawRoom = ({ room, onHover, onClick }: RoomProps) => {
         width={width}
         height={height}
         fill={tempColor}
-        stroke="#333"
-        strokeWidth="2"
+        stroke="hsl(var(--border))"
+        strokeWidth="3"
         onMouseEnter={() => onHover?.(room.name)}
         onClick={() => onClick?.(room)}
         style={{ cursor: onClick ? "pointer" : "default" }}
       />
 
-      {/* Light indicator (yellow glow in corner) */}
-      {room.lightOn && (
-        <circle
-          cx={room.bounds.rightX - 15}
-          cy={room.bounds.topY + 15}
-          r="8"
-          fill="#FFD700"
-          stroke="#FFA500"
-          strokeWidth="1"
-        >
-          <animate
-            attributeName="opacity"
-            values="0.6;1;0.6"
-            dur="2s"
-            repeatCount="indefinite"
-          />
-        </circle>
-      )}
-
       {/* Room name */}
       <text
         x={centerX}
-        y={centerY - 20}
+        y={centerY - 30}
         textAnchor="middle"
-        fill="#333"
-        fontSize="14"
+        fill="#000000"
+        fontSize="22"
         fontWeight="bold"
+        stroke="#000000"
+        strokeWidth="0.5"
       >
-        {room.name.replace(/_/g, " ")}
+        {room.name
+          .replace(/_/g, " ")
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")}
       </text>
 
       {/* Current temperature */}
       <text
         x={centerX}
-        y={centerY + 5}
+        y={centerY + 10}
         textAnchor="middle"
-        fill="#333"
-        fontSize="24"
+        fill="#000000"
+        fontSize="48"
         fontWeight="bold"
+        stroke="#000000"
+        strokeWidth="0.5"
       >
         {Math.round(room.currentTemp)}°F
       </text>
@@ -102,10 +91,12 @@ export const DrawRoom = ({ room, onHover, onClick }: RoomProps) => {
         <>
           <text
             x={centerX}
-            y={centerY + 25}
+            y={centerY + 45}
             textAnchor="middle"
-            fill="#666"
-            fontSize="12"
+            fill="#333333"
+            fontSize="18"
+            stroke="#333333"
+            strokeWidth="0.3"
           >
             → {Math.round(room.targetTemp)}°F
           </text>
@@ -114,10 +105,11 @@ export const DrawRoom = ({ room, onHover, onClick }: RoomProps) => {
           {room.hvacMode !== "off" && (
             <text
               x={centerX}
-              y={centerY + 40}
+              y={centerY + 70}
               textAnchor="middle"
-              fill={room.hvacMode === "heat" ? "#FF6B6B" : "#4ECDC4"}
-              fontSize="12"
+              fill={room.hvacMode === "heat" ? "#CC0000" : "#006666"}
+              fontSize="18"
+              fontWeight="bold"
             >
               {room.hvacMode === "heat" ? "↑ HEATING" : "↓ COOLING"}
             </text>

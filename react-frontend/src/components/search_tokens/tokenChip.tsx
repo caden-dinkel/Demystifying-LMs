@@ -60,12 +60,12 @@ export const TokenChip = ({
               data-token-id={id}
               className={cn(
                 "flex w-full items-center justify-between gap-2",
-                "min-w-[150px] h-auto px-3 py-2",
+                "min-w-[100px] h-auto px-2 py-1.5 text-sm",
                 className
               )}
               {...props}
             >
-              <span className="truncate flex-1 text-left">{token}</span>
+              <span className="truncate flex-1 text-left text-xs">{token}</span>
               <span className="text-xs font-mono whitespace-nowrap">
                 {Math.round(prob * 1000) / 10}%
               </span>

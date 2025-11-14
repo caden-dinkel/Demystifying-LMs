@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import styles from "../../styles/chess.module.css";
 
 type GameStatus = "playing" | "game-over";
 
@@ -22,7 +23,8 @@ const AIChessGame = () => {
   const [position, setPosition] = useState(game.fen());
   const [gameStatus, setGameStatus] = useState<GameStatus>("playing");
   const [isLMThinking, setIsLMThinking] = useState(false);
-  const [moveHistory, setMoveHistory] = useState<string[]>([]);
+  const [moveHistory, setMoveHistory] = useState<string[]>([]); // Display history (SAN format)
+  const [uciMoveHistory, setUciMoveHistory] = useState<string[]>([]); // UCI format for API
   const [statusMessage, setStatusMessage] = useState("Your turn (White)");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [allowIllegalMoves, setAllowIllegalMoves] = useState(false);
@@ -32,6 +34,8 @@ const AIChessGame = () => {
     to: string;
   } | null>(null);
   const [showPromotionDialog, setShowPromotionDialog] = useState(false);
+  const [lastLMPrompt, setLastLMPrompt] = useState<string | null>(null);
+  const [lastLMResponse, setLastLMResponse] = useState<string | null>(null);
 
   // Update game status whenever position changes
   useEffect(() => {
@@ -74,7 +78,17 @@ const AIChessGame = () => {
     setErrorMessage(null);
     try {
       const currentFen = game.fen();
-      const lmMove = await getLMMove(currentFen, selectedLM);
+      const lmMoveData = await getLMMove(
+        currentFen,
+        selectedLM,
+        uciMoveHistory
+      );
+
+      // Store the prompt and response
+      if (lmMoveData.prompt) setLastLMPrompt(lmMoveData.prompt);
+      if (lmMoveData.response) setLastLMResponse(lmMoveData.response);
+
+      const lmMove = lmMoveData.move;
 
       if (lmMove === "game_over" || lmMove === "invalid_move") {
         setErrorMessage("LM couldn't generate a valid move. You may have won!");
@@ -92,6 +106,7 @@ const AIChessGame = () => {
             ...prev,
             `${Math.floor(prev.length / 2) + 1}... ${move.san}`,
           ]);
+          setUciMoveHistory((prev) => [...prev, lmMove]);
         } else {
           // Move was illegal
           if (allowIllegalMoves) {
@@ -134,6 +149,7 @@ const AIChessGame = () => {
                 ...prev,
                 `${Math.floor(prev.length / 2) + 1}... ${lmMove} (illegal)`,
               ]);
+              setUciMoveHistory((prev) => [...prev, lmMove]);
               setErrorMessage(
                 `⚠️ LM made an illegal move: ${lmMove} (forced through)`
               );
@@ -249,6 +265,7 @@ const AIChessGame = () => {
           ...prev,
           `${Math.floor(prev.length / 2) + 1}. ${move.san}`,
         ]);
+        setUciMoveHistory((prev) => [...prev, move.from + move.to]);
         setErrorMessage(null);
         return true;
       } catch (error) {
@@ -275,6 +292,7 @@ const AIChessGame = () => {
           ...prev,
           `${Math.floor(prev.length / 2) + 1}. ${move.san}`,
         ]);
+        setUciMoveHistory((prev) => [...prev, move.from + move.to + piece]);
         setErrorMessage(null);
       }
     } catch (error) {
@@ -291,46 +309,18 @@ const AIChessGame = () => {
     setPosition(newGame.fen());
     setGameStatus("playing");
     setMoveHistory([]);
+    setUciMoveHistory([]);
     setErrorMessage(null);
     setIsLMThinking(false);
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "2rem",
-        position: "relative",
-      }}
-    >
+    <div className={styles.chessContainer}>
       {/* Backdrop for promotion dialog */}
-      {showPromotionDialog && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            zIndex: 999,
-          }}
-        />
-      )}
+      {showPromotionDialog && <div className={styles.backdrop} />}
 
       {/* Chessboard */}
-      <div
-        style={{
-          flex: "0 0 600px",
-          width: "600px",
-          height: "600px",
-          minWidth: "600px",
-          minHeight: "600px",
-          maxWidth: "600px",
-          maxHeight: "600px",
-          position: "relative",
-        }}
-      >
+      <div className={styles.boardContainer}>
         <Chessboard
           options={{
             position,
@@ -349,124 +339,40 @@ const AIChessGame = () => {
 
         {/* Promotion Dialog */}
         {showPromotionDialog && (
-          <div
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              backgroundColor: "white",
-              padding: "2rem",
-              borderRadius: "8px",
-              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-              zIndex: 1000,
-              border: "1px solid #e5e7eb",
-            }}
-          >
-            <h3
-              style={{
-                margin: "0 0 1.5rem 0",
-                textAlign: "center",
-                fontSize: "1.125rem",
-                fontWeight: "600",
-              }}
-            >
-              Choose Promotion Piece
-            </h3>
-            <div
-              style={{ display: "flex", gap: "1rem", justifyContent: "center" }}
-            >
+          <div className={styles.promotionDialog}>
+            <h3 className={styles.promotionTitle}>Choose Promotion Piece</h3>
+            <div className={styles.promotionGrid}>
               <button
                 onClick={() => handlePromotion("q")}
-                style={{
-                  padding: "1rem",
-                  fontSize: "3rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "4px",
-                  backgroundColor: "white",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f3f4f6";
-                  e.currentTarget.style.borderColor = "#9ca3af";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = "white";
-                  e.currentTarget.style.borderColor = "#d1d5db";
-                }}
+                className={styles.pieceButton}
                 title="Queen"
               >
-                ♕
+                <span className={styles.pieceIcon}>♕</span>
+                <span className={styles.pieceName}>Queen</span>
               </button>
               <button
                 onClick={() => handlePromotion("r")}
-                style={{
-                  padding: "1rem",
-                  fontSize: "3rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "4px",
-                  backgroundColor: "white",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f3f4f6";
-                  e.currentTarget.style.borderColor = "#9ca3af";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = "white";
-                  e.currentTarget.style.borderColor = "#d1d5db";
-                }}
+                className={styles.pieceButton}
                 title="Rook"
               >
-                ♖
+                <span className={styles.pieceIcon}>♖</span>
+                <span className={styles.pieceName}>Rook</span>
               </button>
               <button
                 onClick={() => handlePromotion("b")}
-                style={{
-                  padding: "1rem",
-                  fontSize: "3rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "4px",
-                  backgroundColor: "white",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f3f4f6";
-                  e.currentTarget.style.borderColor = "#9ca3af";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = "white";
-                  e.currentTarget.style.borderColor = "#d1d5db";
-                }}
+                className={styles.pieceButton}
                 title="Bishop"
               >
-                ♗
+                <span className={styles.pieceIcon}>♗</span>
+                <span className={styles.pieceName}>Bishop</span>
               </button>
               <button
                 onClick={() => handlePromotion("n")}
-                style={{
-                  padding: "1rem",
-                  fontSize: "3rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "4px",
-                  backgroundColor: "white",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f3f4f6";
-                  e.currentTarget.style.borderColor = "#9ca3af";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = "white";
-                  e.currentTarget.style.borderColor = "#d1d5db";
-                }}
+                className={styles.pieceButton}
                 title="Knight"
               >
-                ♘
+                <span className={styles.pieceIcon}>♘</span>
+                <span className={styles.pieceName}>Knight</span>
               </button>
             </div>
           </div>
@@ -474,14 +380,7 @@ const AIChessGame = () => {
       </div>
 
       {/* Game Info Panel */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-        }}
-      >
+      <div className={styles.controlsSection}>
         {/* Status */}
         <Item variant="outline">
           <ItemContent>
@@ -538,6 +437,35 @@ const AIChessGame = () => {
                 ))
               )}
             </ItemGroup>
+          </CardContent>
+        </Card>
+
+        {/* LM Communication */}
+        <Card className={styles.lmCommunicationCard}>
+          <CardHeader>
+            <CardTitle>LM Communication</CardTitle>
+          </CardHeader>
+          <CardContent className={styles.lmCommunicationContent}>
+            <div className={styles.communicationSection}>
+              <div className={styles.communicationLabel}>Prompt Sent to LM</div>
+              {lastLMPrompt ? (
+                <div className={styles.communicationText}>{lastLMPrompt}</div>
+              ) : (
+                <div className={styles.communicationEmpty}>
+                  No moves made yet. The LM's prompt will appear here.
+                </div>
+              )}
+            </div>
+            <div className={styles.communicationSection}>
+              <div className={styles.communicationLabel}>LM Response</div>
+              {lastLMResponse ? (
+                <div className={styles.communicationText}>{lastLMResponse}</div>
+              ) : (
+                <div className={styles.communicationEmpty}>
+                  No moves made yet. The LM's response will appear here.
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 

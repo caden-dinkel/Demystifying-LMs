@@ -1,5 +1,14 @@
 import { ToolCall } from "@/utilities/types";
 import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface ToolCallDisplayProps {
   reasoning: string;
@@ -19,188 +28,80 @@ export const ToolCallDisplay = ({
   }
 
   return (
-    <div
-      style={{
-        backgroundColor: "#f5f5f5",
-        border: "2px solid #ddd",
-        borderRadius: "8px",
-        padding: "1rem",
-        marginTop: "1rem",
-        maxHeight: "400px",
-        overflowY: "auto",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "0.5rem",
-        }}
-      >
-        <h3 style={{ margin: 0, color: "#333" }}>LM Planner Output</h3>
-        <button
-          onClick={() => setExpanded(!expanded)}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1.2rem",
-          }}
-        >
-          {expanded ? "−" : "+"}
-        </button>
-      </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>LM Planner Output</CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </CardHeader>
 
       {expanded && (
-        <>
+        <CardContent className="space-y-4 max-h-96 overflow-y-auto">
           {/* Reasoning Section */}
           {reasoning && (
-            <div
-              style={{
-                backgroundColor: "#fff",
-                padding: "0.75rem",
-                borderRadius: "4px",
-                marginBottom: "1rem",
-                border: "1px solid #e0e0e0",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "0.85rem",
-                  fontWeight: "bold",
-                  color: "#666",
-                  marginBottom: "0.5rem",
-                }}
-              >
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-muted-foreground">
                 Reasoning:
-              </div>
-              <div style={{ fontSize: "0.9rem", color: "#333" }}>
-                {reasoning}
-              </div>
+              </h4>
+              <p className="text-sm">{reasoning}</p>
             </div>
           )}
 
           {/* Tool Calls Section */}
           {toolCalls.length > 0 && (
-            <div>
-              <div
-                style={{
-                  fontSize: "0.85rem",
-                  fontWeight: "bold",
-                  color: "#666",
-                  marginBottom: "0.5rem",
-                }}
-              >
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-muted-foreground">
                 Tool Calls ({toolCalls.length}):
-              </div>
+              </h4>
               {toolCalls.map((toolCall, index) => (
                 <div
                   key={index}
-                  style={{
-                    backgroundColor: "#fff",
-                    padding: "0.75rem",
-                    borderRadius: "4px",
-                    marginBottom: "0.5rem",
-                    border: "1px solid #e0e0e0",
-                    position: "relative",
-                  }}
+                  className="bg-card border rounded-lg p-3 space-y-2"
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                      }}
-                    >
-                      <span
-                        style={{
-                          backgroundColor: "#007bff",
-                          color: "white",
-                          borderRadius: "50%",
-                          width: "24px",
-                          height: "24px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "0.75rem",
-                          fontWeight: "bold",
-                        }}
-                      >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">
                         {index + 1}
                       </span>
-                      <span
-                        style={{
-                          fontFamily: "monospace",
-                          fontWeight: "bold",
-                          color: "#007bff",
-                        }}
-                      >
+                      <span className="font-mono font-semibold text-primary">
                         {toolCall.tool_name}
                       </span>
                     </div>
 
                     {/* Success/Failure indicator */}
                     {toolCall.success !== undefined && (
-                      <span
-                        style={{
-                          fontSize: "1.2rem",
-                        }}
-                      >
+                      <span className="text-lg">
                         {toolCall.success ? "✅" : "❌"}
                       </span>
                     )}
                   </div>
 
                   {/* Arguments */}
-                  <div
-                    style={{
-                      marginTop: "0.5rem",
-                      fontSize: "0.85rem",
-                      color: "#666",
-                    }}
-                  >
-                    <strong>Arguments:</strong>
-                    <pre
-                      style={{
-                        backgroundColor: "#f9f9f9",
-                        padding: "0.5rem",
-                        borderRadius: "4px",
-                        margin: "0.25rem 0 0 0",
-                        fontSize: "0.8rem",
-                        overflow: "auto",
-                      }}
-                    >
+                  <div className="text-sm">
+                    <strong className="text-muted-foreground">
+                      Arguments:
+                    </strong>
+                    <pre className="mt-1 bg-muted p-2 rounded text-xs overflow-auto">
                       {JSON.stringify(toolCall.arguments, null, 2)}
                     </pre>
                   </div>
 
                   {/* Result (if available) */}
                   {toolCall.result !== undefined && (
-                    <div
-                      style={{
-                        marginTop: "0.5rem",
-                        fontSize: "0.85rem",
-                        color: "#666",
-                      }}
-                    >
-                      <strong>Result:</strong>
-                      <div
-                        style={{
-                          backgroundColor: "#f0f7ff",
-                          padding: "0.5rem",
-                          borderRadius: "4px",
-                          marginTop: "0.25rem",
-                          fontSize: "0.85rem",
-                        }}
-                      >
+                    <div className="text-sm">
+                      <strong className="text-muted-foreground">Result:</strong>
+                      <div className="mt-1 bg-blue-50 dark:bg-blue-950 p-2 rounded text-sm">
                         {typeof toolCall.result === "string"
                           ? toolCall.result
                           : JSON.stringify(toolCall.result)}
@@ -210,13 +111,7 @@ export const ToolCallDisplay = ({
 
                   {/* Timestamp */}
                   {toolCall.timestamp && (
-                    <div
-                      style={{
-                        marginTop: "0.5rem",
-                        fontSize: "0.75rem",
-                        color: "#999",
-                      }}
-                    >
+                    <div className="text-xs text-muted-foreground">
                       {new Date(toolCall.timestamp).toLocaleTimeString()}
                     </div>
                   )}
@@ -227,19 +122,12 @@ export const ToolCallDisplay = ({
 
           {/* Executing indicator */}
           {isExecuting && (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "1rem",
-                color: "#007bff",
-                fontWeight: "bold",
-              }}
-            >
+            <div className="text-center py-4 text-primary font-semibold">
               Executing tool calls...
             </div>
           )}
-        </>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 };

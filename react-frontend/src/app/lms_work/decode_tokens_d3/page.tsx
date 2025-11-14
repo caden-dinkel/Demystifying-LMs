@@ -3,9 +3,8 @@
 import { useState, useCallback } from "react";
 import Navbar from "@/components/navigation/navBar";
 import { LMTextarea } from "@/components/lmTextarea";
-import { TokenSearch } from "@/components/search_tokens/userSearchTree";
-import { AlgoSearchTreeNew } from "@/components/search_tokens/algoSearchTreeNew";
-import { ConnectorLayoutProvider } from "@/components/search_tokens/useConnectorLayout";
+import { UserSearchTreeD3 } from "@/components/search_tokens/userSearchTreeD3";
+import { AlgoSearchTreeD3 } from "@/components/search_tokens/algoSearchTreeD3";
 import { Button } from "@/components/ui/button";
 import {
   PlayIcon,
@@ -15,7 +14,7 @@ import {
 } from "@radix-ui/react-icons";
 import styles from "@/styles/main-layout.module.css";
 
-export default function SearchingForWords() {
+export default function SearchingForWordsD3() {
   const [prompt, setPrompt] = useState<string>("");
   const [showTree, setShowTree] = useState<boolean>(false);
   const [searchMode, setSearchMode] = useState<"manual" | "algorithmic">(
@@ -33,11 +32,11 @@ export default function SearchingForWords() {
       <main className={styles.baseMain}>
         <div className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight mb-2">
-            Searching for Words
+            Searching for Words (D3)
           </h1>
           <p className="text-muted-foreground">
-            Explore how language models search through possible tokens to
-            generate text.
+            Explore how language models search through possible tokens using an
+            interactive D3 visualization.
           </p>
         </div>
 
@@ -60,11 +59,14 @@ export default function SearchingForWords() {
         <LMTextarea onSend={handleStartSearch} />
 
         {showTree && (
-          <ConnectorLayoutProvider>
+          <>
             {searchMode === "manual" ? (
-              <TokenSearch key={`manual-${prompt}`} initialPrompt={prompt} />
+              <UserSearchTreeD3
+                key={`manual-${prompt}`}
+                initialPrompt={prompt}
+              />
             ) : (
-              <AlgoSearchTreeNew
+              <AlgoSearchTreeD3
                 key={`algo-${prompt}`}
                 initialPrompt={prompt}
                 autoStart={true}
@@ -171,7 +173,7 @@ export default function SearchingForWords() {
                 )}
               />
             )}
-          </ConnectorLayoutProvider>
+          </>
         )}
       </main>
     </div>

@@ -4,6 +4,7 @@ import * as d3 from "d3";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { useLMSettings } from "@/components/settings/lmSettingsProvider";
 import { SearchTreeProvider, useSearchTree } from "./useSearchTree";
+import styles from "../../styles/search-tree.module.css";
 
 export interface UserSearchTreeD3Props {
   initialPrompt: string;
@@ -42,7 +43,7 @@ const UserSearchTreeD3Content = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  // Convert searchTree Map to D3 hierarchy - only show path and current children
+  // Convert searchTree Map to D3 hierarchy - show path and all siblings
   const buildD3Tree = useCallback((): D3Node | null => {
     if (searchPath.length === 0) return null;
 
@@ -51,7 +52,7 @@ const UserSearchTreeD3Content = () => {
     const currentNode = searchTree.get(currentNodeId);
     if (!currentNode) return null;
 
-    // Build only the selected path nodes + children of current node
+    // Build the selected path nodes + all siblings along the path + children of current node
     const buildNode = (nodeId: string, depth: number): D3Node | null => {
       const node = searchTree.get(nodeId);
       if (!node) return null;
@@ -65,7 +66,7 @@ const UserSearchTreeD3Content = () => {
         isSelected: node.isSelected,
       };
 
-      // Only show children if this is the current node or in the path
+      // Check if this node is in the path or is the current node
       const isInPath = searchPath.includes(nodeId);
       const isCurrentNode = nodeId === currentNodeId;
 
@@ -74,14 +75,15 @@ const UserSearchTreeD3Content = () => {
         d3Node.children = node.childrenNodeIds
           .map((childId) => buildNode(childId, depth + 1))
           .filter((n): n is D3Node => n !== null);
-      } else if (isInPath && depth < searchPath.length - 1) {
-        // For path nodes, only show the next node in the path
-        const nextNodeId = searchPath[depth + 1];
-        if (nextNodeId && node.childrenNodeIds.includes(nextNodeId)) {
-          d3Node.children = [buildNode(nextNodeId, depth + 1)].filter(
-            (n): n is D3Node => n !== null
-          );
-        }
+      } else if (
+        isInPath &&
+        depth < searchPath.length - 1 &&
+        node.childrenNodeIds.length > 0
+      ) {
+        // For path nodes, show ALL children (including unchosen siblings)
+        d3Node.children = node.childrenNodeIds
+          .map((childId) => buildNode(childId, depth + 1))
+          .filter((n): n is D3Node => n !== null);
       }
 
       return d3Node;
@@ -511,67 +513,26 @@ const UserSearchTreeD3Content = () => {
   const currentPrompt = buildPromptFromPath();
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "600px",
-        position: "relative",
-        overflow: "auto",
-      }}
-    >
+    <div className={styles.svgContainer}>
       {/* Draggable Generated Text Box */}
       <div
+        className={styles.textBox}
         style={{
-          position: "absolute",
           left: `${textBoxPosition.x}px`,
           top: `${textBoxPosition.y}px`,
-          backgroundColor: "white",
-          border: "1px solid #e5e7eb",
-          borderRadius: "8px",
-          padding: "1rem",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-          zIndex: 1000,
-          minWidth: "300px",
-          maxWidth: "500px",
           cursor: isDragging ? "grabbing" : "grab",
         }}
         onMouseDown={handleMouseDown}
       >
-        <div
-          style={{
-            fontWeight: "600",
-            fontSize: "0.875rem",
-            color: "#374151",
-            marginBottom: "0.5rem",
-            userSelect: "none",
-          }}
-        >
-          Generated Text
-        </div>
-        <div
-          style={{
-            fontFamily: "monospace",
-            fontSize: "0.875rem",
-            color: "#111827",
-            lineHeight: "1.5",
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-          }}
-        >
-          {currentPrompt}
-        </div>
+        <div className={styles.textBoxTitle}>Generated Text</div>
+        <div className={styles.textBoxContent}>{currentPrompt}</div>
       </div>
 
       <svg
         ref={svgRef}
         width={dimensions.width}
         height={dimensions.height}
-        style={{
-          border: "1px solid #e2e8f0",
-          borderRadius: "8px",
-          minWidth: "100%",
-          minHeight: "100%",
-        }}
+        className={styles.svgCanvas}
       />
     </div>
   );

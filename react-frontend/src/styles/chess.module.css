@@ -1,0 +1,246 @@
+.chessContainer {
+  display: flex;
+  gap: 2rem;
+  position: relative;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.boardContainer {
+  flex: 0 0 600px;
+  width: 600px;
+  height: 600px;
+  min-width: 600px;
+  min-height: 600px;
+  max-width: 600px;
+  max-height: 600px;
+  position: relative;
+}
+
+.promotionDialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: hsl(var(--card));
+  border: 2px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  z-index: 1000;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.promotionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: hsl(var(--foreground));
+}
+
+.promotionGrid {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.pieceButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: hsl(var(--secondary));
+  border: 2px solid hsl(var(--border));
+  border-radius: calc(var(--radius) - 2px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pieceButton:hover {
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--ring));
+  transform: translateY(-2px);
+}
+
+.pieceIcon {
+  font-size: 3rem;
+}
+
+.pieceName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+.controlsSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 350px;
+}
+
+.statusCard {
+  min-height: 80px;
+}
+
+.controlsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.historyCard {
+  flex: 1;
+}
+
+.historyContent {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.emptyHistory {
+  text-align: center;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+  padding: 1rem 0;
+}
+
+.moveList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.moveItem {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: hsl(var(--muted));
+  border-radius: calc(var(--radius) - 4px);
+}
+
+.moveNumber {
+  font-weight: 600;
+  margin-right: 0.75rem;
+  min-width: 3rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+.moveText {
+  font-size: 0.875rem;
+  color: hsl(var(--foreground));
+}
+
+.gameInfoCard {
+  font-size: 0.875rem;
+}
+
+.gameInfoContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gameInfoItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gameInfoLabel {
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+.gameInfoValue {
+  color: hsl(var(--muted-foreground));
+}
+
+.rulesCard {
+  font-size: 0.875rem;
+}
+
+.rulesContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rulesList {
+  list-style: disc;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.statusSuccess {
+  color: hsl(var(--foreground));
+}
+
+.statusError {
+  color: hsl(var(--destructive));
+}
+
+.errorMessage {
+  color: hsl(var(--destructive));
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.lmCommunicationCard {
+  font-size: 0.875rem;
+}
+
+.lmCommunicationContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.communicationSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.communicationLabel {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.communicationText {
+  padding: 0.75rem;
+  background-color: hsl(var(--muted));
+  border-radius: calc(var(--radius) - 4px);
+  font-family: monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: hsl(var(--foreground));
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.communicationEmpty {
+  padding: 0.75rem;
+  text-align: center;
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
+  font-size: 0.8125rem;
+}

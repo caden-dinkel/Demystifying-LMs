@@ -25,10 +25,11 @@ export function ActiveLink(linkProps: ActiveLinkProps) {
       >
         {linkProps.children}
         <span
-          style={{
-            transform: hasDropdown ? "scaleX(1)" : "scaleX(0)",
-          }}
-          className={navbar.navLinkIndicator}
+          className={`${navbar.navLinkIndicator} ${
+            hasDropdown
+              ? navbar.navLinkIndicatorVisible
+              : navbar.navLinkIndicatorHidden
+          }`}
         />
       </Link>
       {hasDropdown && linkProps.dropDownContent}

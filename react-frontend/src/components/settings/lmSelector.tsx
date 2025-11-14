@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { GPT_LM, LLAMA_LM } from "@/api/config";
+import { GPT_LM, LLAMA_LM, CHESS_LLAMA_LM } from "@/api/config";
 
 export interface LMSelectorProps {
   selectedLM: string;
@@ -33,6 +33,11 @@ export const LMSelector = ({ selectedLM, onLMChange }: LMSelectorProps) => {
             Llama-3.2
             <span className="inline-block h-3 w-px bg-gray-400 mx-2 align-middle" />
             Query Response
+          </SelectItem>
+          <SelectItem value={CHESS_LLAMA_LM}>
+            Chess-Llama
+            <span className="inline-block h-3 w-px bg-gray-400 mx-2 align-middle" />
+            Chess Moves
           </SelectItem>
         </SelectGroup>
       </SelectContent>
