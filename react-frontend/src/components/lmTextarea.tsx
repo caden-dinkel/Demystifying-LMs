@@ -1,110 +1,146 @@
 import {
-  InputGroupTextarea,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupText,
+    InputGroupTextarea,
+    InputGroup,
+    InputGroupAddon,
+    InputGroupButton,
+    InputGroupText,
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { ArrowUpIcon } from "@radix-ui/react-icons";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, ReactNode, ReactElement } from "react"; // EDITED: Added ReactElement
 import { useLMSettings } from "@/components/settings/lmSettingsProvider";
 import { Spinner } from "./ui/spinner";
 import { LMSelector } from "./settings/lmSelector";
+import { Button } from "./ui/button";
+import React from 'react';
+
+interface ExampleButtonProps {
+    setInputValue: (value: string) => void;
+    disabled: boolean;
+}
 
 interface LMTextareaProps {
-  onSend: (input: string, mode: string) => void | Promise<void>;
-  placeholder?: string;
-  // Marker to indicate when to end loading state.
-  messageRepliedTo?: boolean;
+    onSend: (input: string, mode: string) => void | Promise<void>;
+    placeholder?: string;
+    messageRepliedTo?: boolean;
+        exampleButton?: ReactElement<ExampleButtonProps>;
 }
 
 export const LMTextarea = ({
-  onSend,
-  placeholder = "Ask, Search or Chat...",
-  messageRepliedTo,
+    onSend,
+    placeholder = "Ask, Search or Chat...",
+    messageRepliedTo,
+    exampleButton,
 }: LMTextareaProps) => {
-  // Get current model from settings
-  const { selectedLM, setSelectedLM } = useLMSettings();
+    // Get current model from settings
+    const { selectedLM, setSelectedLM } = useLMSettings();
 
-  const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+    const [inputValue, setInputValue] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
-  // Update loading state when message is replied to
-  useEffect(() => {
-    if (messageRepliedTo) {
-      setIsLoading(false);
-    }
-  }, [messageRepliedTo]);
+    const setExternalInputValue = useCallback((value: string) => {
+        setInputValue(value);
+    }, []);
 
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setInputValue(e.target.value);
-    },
-    []
-  );
+    // Update loading state when message is replied to
+    useEffect(() => {
+        if (messageRepliedTo) {
+            setIsLoading(false);
+        }
+    }, [messageRepliedTo]);
 
-  const handleKeyPress = useCallback(
-    async (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
+    const handleInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            setInputValue(e.target.value);
+        },
+        []
+    );
+
+    const handleKeyPress = useCallback(
+        async (e: React.KeyboardEvent) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                const trimmedInput = inputValue.trim();
+                if (trimmedInput) {
+                    setIsLoading(true);
+                    try {
+                        await onSend(trimmedInput, selectedLM);
+                    } finally {
+                        setIsLoading(false);
+                    }
+                    setInputValue("");
+                }
+            }
+        },
+        [inputValue, selectedLM, onSend]
+    );
+
+    const handleClickSend = useCallback(async () => {
         const trimmedInput = inputValue.trim();
         if (trimmedInput) {
-          setIsLoading(true);
-          try {
-            await onSend(trimmedInput, selectedLM);
-          } finally {
-            setIsLoading(false);
-          }
-          setInputValue("");
+            setIsLoading(true);
+            try {
+                await onSend(trimmedInput, selectedLM);
+            } finally {
+                setIsLoading(false);
+            }
+            setInputValue("");
         }
-      }
-    },
-    [inputValue, selectedLM, onSend]
-  );
+    }, [inputValue, selectedLM, onSend]);
 
-  const handleClickSend = useCallback(async () => {
-    const trimmedInput = inputValue.trim();
-    if (trimmedInput) {
-      setIsLoading(true);
-      try {
-        await onSend(trimmedInput, selectedLM);
-      } finally {
-        setIsLoading(false);
-      }
-      setInputValue("");
-    }
-  }, [inputValue, selectedLM, onSend]);
+    return (
+        <InputGroup>
+            <InputGroupTextarea
+                placeholder={placeholder}
+                value={inputValue}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyPress}
+                disabled={isLoading}
+            />
+            <InputGroupAddon align="block-end">
+                <LMSelector selectedLM={selectedLM} onLMChange={setSelectedLM} />
+                {isLoading ? (
+                    <Spinner />
+                ) : (
+                    <>
+                        {exampleButton && React.cloneElement(exampleButton, {
+                            setInputValue: setExternalInputValue,
+                            disabled: isLoading,
+                        })}
+                        <InputGroupText className="ml-auto">Send</InputGroupText>
+                        <Separator orientation="vertical" className="!h-4" />
+                        <InputGroupButton
+                            variant="default"
+                            className="rounded-full"
+                            size="icon-xs"
+                            onClick={() => handleClickSend()}
+                            disabled={!inputValue.trim() || isLoading}
+                        >
+                            <ArrowUpIcon />
+                        </InputGroupButton>
+                    </>
+                )}
+            </InputGroupAddon>
+        </InputGroup>
+    );
+};
 
-  return (
-    <InputGroup>
-      <InputGroupTextarea
-        placeholder={placeholder}
-        value={inputValue}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyPress}
-        disabled={isLoading}
-      />
-      <InputGroupAddon align="block-end">
-        <LMSelector selectedLM={selectedLM} onLMChange={setSelectedLM} />
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <>
-            <InputGroupText className="ml-auto">Send</InputGroupText>
-            <Separator orientation="vertical" className="!h-4" />
-            <InputGroupButton
-              variant="default"
-              className="rounded-full"
-              size="icon-xs"
-              onClick={() => handleClickSend()}
-              disabled={!inputValue.trim() || isLoading}
-            >
-              <ArrowUpIcon />
-            </InputGroupButton>
-          </>
-        )}
-      </InputGroupAddon>
-    </InputGroup>
-  );
+export const ExamplePromptButton = ({ setInputValue, disabled }: ExampleButtonProps) => {
+    const EXAMPLE_PROMPT = "The capital of France is ";
+
+    const handleClick = () => {
+        setInputValue(EXAMPLE_PROMPT);
+    };
+
+    return (
+        <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClick}
+            disabled={disabled}
+            className="mr-2"
+        >
+            Show Example
+        </Button>
+    );
 };
