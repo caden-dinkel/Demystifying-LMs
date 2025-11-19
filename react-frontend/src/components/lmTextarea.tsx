@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { ArrowUpIcon } from "@radix-ui/react-icons";
-import { useState, useCallback, useEffect, ReactNode, ReactElement } from "react"; // EDITED: Added ReactElement
+import { useState, useCallback, useEffect, ReactNode, ReactElement } from "react";
 import { useLMSettings } from "@/components/settings/lmSettingsProvider";
 import { Spinner } from "./ui/spinner";
 import { LMSelector } from "./settings/lmSelector";
@@ -17,13 +17,14 @@ import React from 'react';
 interface ExampleButtonProps {
     setInputValue: (value: string) => void;
     disabled: boolean;
+    exampleText?: string;
 }
 
 interface LMTextareaProps {
     onSend: (input: string, mode: string) => void | Promise<void>;
     placeholder?: string;
     messageRepliedTo?: boolean;
-        exampleButton?: ReactElement<ExampleButtonProps>;
+    exampleButton?: ReactElement<ExampleButtonProps>;
 }
 
 export const LMTextarea = ({
@@ -38,6 +39,7 @@ export const LMTextarea = ({
     const [inputValue, setInputValue] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    // Function to inject text into the textarea's state from the example button
     const setExternalInputValue = useCallback((value: string) => {
         setInputValue(value);
     }, []);
@@ -103,6 +105,7 @@ export const LMTextarea = ({
                     <Spinner />
                 ) : (
                     <>
+                        {/* Clones the exampleButton element, injecting the internal state handlers */}
                         {exampleButton && React.cloneElement(exampleButton, {
                             setInputValue: setExternalInputValue,
                             disabled: isLoading,
@@ -124,12 +127,16 @@ export const LMTextarea = ({
         </InputGroup>
     );
 };
+// ExamplePromptButton: uses the optional exampleText prop
+export const ExamplePromptButton = ({ setInputValue, disabled, exampleText }: ExampleButtonProps) => {
+    // Fallback prompt if no specific text is provided in props
+    const DEFAULT_PROMPT = "The capital of France is ";
 
-export const ExamplePromptButton = ({ setInputValue, disabled }: ExampleButtonProps) => {
-    const EXAMPLE_PROMPT = "The capital of France is ";
+    // Determine the prompt to use
+    const promptToUse = exampleText || DEFAULT_PROMPT;
 
     const handleClick = () => {
-        setInputValue(EXAMPLE_PROMPT);
+        setInputValue(promptToUse);
     };
 
     return (

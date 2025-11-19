@@ -59,7 +59,13 @@ export default function SearchingForWords() {
 
                 <LMTextarea
                     onSend={handleStartSearch}
-                    exampleButton={<ExamplePromptButton setInputValue={(_) => { }} disabled={false} />}
+                    exampleButton={
+                        <ExamplePromptButton
+                            setInputValue={(_) => { }}
+                            disabled={false}
+                            exampleText={"The capital of France is"}
+                        />
+                    }
                 />
 
                 {showTree && (
