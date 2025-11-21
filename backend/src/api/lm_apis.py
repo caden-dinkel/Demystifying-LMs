@@ -16,7 +16,6 @@ class LMInput(BaseModel):
     temperature: Optional[float] = 0.7
     max_tokens: Optional[int] = 100
 
-
 class LMOutput(BaseModel):
     token: str
 
@@ -194,7 +193,12 @@ async def iterative_generation(data: LMInput) -> IterativeGenerationResponse:
         gen_kwargs["temperature"] = data.temperature if data.temperature else 0.7
         gen_kwargs["top_p"] = 0.9
     elif data.search_strategy == "Assisted":
-        # Assisted decoding - could use a smaller model as assistant
+        # Assisted decoding - use DistilGPT2 as the assistant model for speculative decoding
+        # This allows the smaller model to propose tokens that the larger model verifies
+        assistant_model = SUPPORTED_MODELS["DistilGPT2"]["model"]
+        gen_kwargs["assistant_model"] = assistant_model
+        gen_kwargs["tokenizer"] = tokenizer
+        gen_kwargs["assistant_tokenizer"] = SUPPORTED_MODELS["DistilGPT2"]["tokenizer"]
         gen_kwargs["do_sample"] = False
     
     print(f"🎯 Using {data.search_strategy} search with params: {gen_kwargs}")

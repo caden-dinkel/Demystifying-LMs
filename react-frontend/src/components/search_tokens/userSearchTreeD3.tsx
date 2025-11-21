@@ -92,6 +92,8 @@ const UserSearchTreeD3Content = () => {
     return buildNode(searchPath[0], 0);
   }, [searchTree, searchPath]);
 
+  // Handle 
+
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
@@ -513,8 +515,7 @@ const UserSearchTreeD3Content = () => {
   const currentPrompt = buildPromptFromPath();
 
   return (
-    <div className={styles.svgContainer}>
-      {/* Draggable Generated Text Box */}
+    <div className={styles.d3Container}>
       <div
         className={styles.textBox}
         style={{
@@ -527,13 +528,15 @@ const UserSearchTreeD3Content = () => {
         <div className={styles.textBoxTitle}>Generated Text</div>
         <div className={styles.textBoxContent}>{currentPrompt}</div>
       </div>
-
-      <svg
-        ref={svgRef}
-        width={dimensions.width}
-        height={dimensions.height}
-        className={styles.svgCanvas}
-      />
+      <div className={styles.svgContainer}>
+        {/* Draggable Generated Text Box */}
+        <svg
+          ref={svgRef}
+          width={dimensions.width}
+          height={dimensions.height}
+          className={styles.svgCanvas}
+        />
+      </div>
     </div>
   );
 };

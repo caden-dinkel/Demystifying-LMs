@@ -13,6 +13,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@radix-ui/react-icons";
+
 import styles from "@/styles/main-layout.module.css";
 
 export default function SearchingForWords() {
@@ -93,6 +94,7 @@ export default function SearchingForWords() {
                     style={{
                       marginBottom: "1rem",
                       display: "flex",
+                      height: "100px",
                       flexDirection: "column",
                       gap: "0.75rem",
                       padding: "0.5rem",
