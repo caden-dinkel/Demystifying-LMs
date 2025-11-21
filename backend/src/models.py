@@ -1,29 +1,7 @@
-from transformers import GPT2LMHeadModel, pipeline, AutoTokenizer, AutoModelForCausalLM, GPT2Tokenizer, PreTrainedTokenizerFast
-from tokenizers import Tokenizer
-from tokenizers.models import WordLevel
+from transformers import GPT2LMHeadModel, pipeline, AutoTokenizer, AutoModelForCausalLM
 import torch
 import re
 import json
-import os
-
-# Create a custom character-level tokenizer for ChessGPT
-def create_chessgpt_tokenizer():
-    vocab_path = "src/model/vocab.json"
-    with open(vocab_path, 'r') as f:
-        vocab = json.load(f)
-    
-    # Create a simple character-level tokenizer
-    tokenizer_obj = Tokenizer(WordLevel(vocab=vocab, unk_token=" "))
-    
-    # Wrap in PreTrainedTokenizerFast
-    tokenizer = PreTrainedTokenizerFast(
-        tokenizer_object=tokenizer_obj,
-        bos_token=";",
-        eos_token="#",
-        pad_token=" ",
-        unk_token=" "
-    )
-    return tokenizer
 
 SUPPORTED_MODELS = {
     "GPT-2": {
@@ -31,22 +9,10 @@ SUPPORTED_MODELS = {
         "model": GPT2LMHeadModel.from_pretrained('gpt2'),
         "pipeline": pipeline('text-generation', model='gpt2', device=0 if torch.cuda.is_available() else -1) # Use GPU if available
     },
-    "DistilGPT2": {
-        "tokenizer": AutoTokenizer.from_pretrained('distilgpt2'),
-        "model": GPT2LMHeadModel.from_pretrained('distilgpt2'),
-        "pipeline": pipeline('text-generation', model='distilgpt2', device=0 if torch.cuda.is_available() else -1)
-    },
     "Llama-3.2": {
         "tokenizer": AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B-Instruct"),
         "model": AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B-Instruct"),
         "pipeline": pipeline("text-generation", model="meta-llama/Llama-3.2-1B-Instruct")
-    },
-    "Chess-Llama": {
-        # Chess-Llama: Llama model fine-tuned on chess games
-        # Load from local directory
-        "tokenizer": AutoTokenizer.from_pretrained("src/model/chessLlama", trust_remote_code=True),
-        "model": AutoModelForCausalLM.from_pretrained("src/model/chessLlama", trust_remote_code=True),
-        "pipeline": None  # We'll use model directly for chess tasks
     }
 }
 

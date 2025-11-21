@@ -27,6 +27,52 @@ TOOLS = [
             },
             "required": ["room_name", "temperature"]
         }
+    },
+    {
+        "name": "set_room_light",
+        "description": "Turn lights on or off in a specific room",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "room_name": {
+                    "type": "string",
+                    "description": "Name of the room"
+                },
+                "state": {
+                    "type": "boolean",
+                    "description": "true to turn lights on, false to turn lights off"
+                }
+            },
+            "required": ["room_name", "state"]
+        }
+    },
+    {
+        "name": "get_person_location",
+        "description": "Get the current room location of a person in the home",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "person_name": {
+                    "type": "string",
+                    "description": "Name of the person"
+                }
+            },
+            "required": ["person_name"]
+        }
+    },
+    {
+        "name": "get_room_status",
+        "description": "Get current temperature, light status, and occupants of a room",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "room_name": {
+                    "type": "string",
+                    "description": "Name of the room"
+                }
+            },
+            "required": ["room_name"]
+        }
     }
 ]
 
@@ -55,36 +101,31 @@ def build_planner_prompt(user_command: str, current_state: dict, tools: list[dic
         tools_description += f"\n{tool['name']}: {tool['description']}\n"
         tools_description += f"  Parameters: {json.dumps(tool['parameters'], indent=2)}\n"
     
-    # Format current state with all relevant information
-    state_summary = f"Rooms (with current temperature and target):\n"
+    # Format current state
+    state_summary = f"Rooms:\n"
     for room in current_state.get("rooms", []):
-        state_summary += f"  - {room['name']}: {room['currentTemp']}°F (target: {room['targetTemp']}°F)\n"
+        state_summary += f"  - {room['name']}: {room['currentTemp']}°F (target: {room['targetTemp']}°F), "
+        state_summary += f"light: {'on' if room['lightOn'] else 'off'}\n"
     
-    state_summary += f"\nPeople (with location and temperature preferences):\n"
+    state_summary += f"\nPeople:\n"
     for person in current_state.get("people", []):
         state_summary += f"  - {person['name']} in {person['location']}, prefers {person['preferredTemp']}°F\n"
     
-    prompt = f"""You are a smart home assistant AI that controls temperature. You have complete information about the home state.
+    prompt = f"""You are a smart home assistant AI. You control a smart home and can use tools to help users.
 
-Available Tool:
+Available Tools:
 {tools_description}
 
-COMPLETE Current Home State (all information provided):
+Current Home State:
 {state_summary}
-
-You can see:
-- Where each person is located
-- Each person's preferred temperature
-- Current temperature in each room
-- Target temperature for each room
 
 User Request: "{user_command}"
 
-Think about what temperature adjustments would make people comfortable. Respond with ONLY valid JSON in this exact format:
+Think step by step about what tools you need to call to fulfill this request. Then respond with ONLY valid JSON in this exact format:
 {{
-  "reasoning": "explain your thought process based on the state information provided above",
+  "reasoning": "explain your thought process",
   "tool_calls": [
-    {{"tool_name": "set_room_temperature", "arguments": {{"room_name": "room_name_here", "temperature": 70}}}}
+    {{"tool_name": "tool_name_here", "arguments": {{"param": "value"}}}}
   ],
   "complete": true
 }}
@@ -92,8 +133,8 @@ Think about what temperature adjustments would make people comfortable. Respond 
 Important:
 - Use the exact room and person names from the current state
 - Temperature must be between 60 and 80 degrees Fahrenheit
-- For commands like "freeze [person]", set their current room to 60°F
-- For comfortable settings, consider each person's preferred temperature
+- For commands like "freeze [person]", set their room to 60°F
+- For party/comfortable settings, use 70-72°F
 - Your response must be valid JSON only, nothing else
 
 JSON Response:"""
