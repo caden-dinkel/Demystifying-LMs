@@ -43,6 +43,7 @@ multidict==6.6.4
 multiprocess==0.70.16
 networkx==3.5
 numpy==2.3.2
+openai>=2.0.0
 orjson==3.11.3
 packaging==25.0
 pandas==2.3.2
