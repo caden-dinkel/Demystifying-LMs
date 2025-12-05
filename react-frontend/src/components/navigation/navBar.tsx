@@ -26,7 +26,7 @@ interface NavItem extends NavLink {
 
 // Data for sub-links
 const WorkNavLinks: NavLink[] = [
-  { name: "Overview", href: "/lms_work" },
+  { name: "How LMs Work", href: "/lms_work" },
   { name: "Tokenizing Text", href: "/lms_work/encode_tokens" },
   { name: "Predicting Next Token", href: "/lms_work/predict_next" },
   { name: "Searching for Words", href: "/lms_work/decode_tokens" },

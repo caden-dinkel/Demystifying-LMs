@@ -79,7 +79,10 @@ export const ArrowConnector: React.FC<ArrowConnectorProps> = ({
     computeLayout();
 
     const handleResize = () => computeLayout();
+    const handleScroll = () => computeLayout();
+
     window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", handleScroll, true);
 
     const promptEl = document.getElementById(PROMPT_ID);
     const tokensContainer = document.getElementById(TOKENS_ID);
@@ -98,6 +101,7 @@ export const ArrowConnector: React.FC<ArrowConnectorProps> = ({
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScroll, true);
       resizeObserver.disconnect();
       mutationObserver.disconnect();
     };

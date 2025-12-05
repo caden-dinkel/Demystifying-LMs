@@ -23,10 +23,7 @@ export const Tokenizer = () => {
   };
 
   return (
-    <div className={styles.section}>
-      <h2>2. Visual Tokenizer</h2>
-      <p>Enter any text to see how the model breaks it down into tokens.</p>
-
+    <div>
       <LMTextarea
         onSend={handleTokenize}
         placeholder="Once upon a time..."
