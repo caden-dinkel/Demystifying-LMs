@@ -1,0 +1,42 @@
+.toggleNormal {
+  /* Use 'secondary' or 'muted' for the background to slightly distinguish it from the main 'background' */
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  border: 1px solid hsl(var(--border));
+
+  /* Hover state for normal button */
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  cursor: pointer;
+}
+
+.toggleNormal:hover {
+  /* Muted is a good color for subtle hover on unselected items */
+  background-color: hsl(var(--muted));
+}
+
+/*
+  This style is for the selected (active) button in the toggle group.
+  It uses 'primary' for the solid fill and 'primary-foreground' for the text,
+  which makes it stand out as the active choice.
+*/
+.toggleSelected {
+  /* The active, selected color */
+  background-color: hsl(var(--primary));
+  color: hsl(
+    var(--primary-foreground)
+  ); /* High-contrast text on the primary color */
+  border: 1px solid hsl(var(--primary)); /* Border matches fill */
+
+  /* Ensures it looks solid and prevents changes on hover/click */
+  font-weight: 600; /* Makes selected text bold for emphasis */
+  cursor: default; /* Change cursor to indicate it's already selected */
+}
+
+.toggleGroup {
+  display: flex;
+  /* Aligns items vertically */
+  align-items: center;
+  justify-items: center;
+  /* Optional: Small gap between buttons if you DON'T want them connected */
+  /* gap: 4px; */
+}

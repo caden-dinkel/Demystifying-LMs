@@ -1,0 +1,227 @@
+/* styles/tokens.module.css */
+/* Structure for SearchTree:
+<AnimationContainer> 1).
+  <ContentContainer>  2).
+  <LHSContainer>  3).
+    <PromptDisplay />  <-- one of these 4).
+  </LHSContainer> 3).
+  <RHSContainer>  5).
+    <TokenMap />    6).   <-- multiple of these
+  </RHSContainer> 5).
+  </ContentContainer> 2).
+  <SVGOverlay />    7).  <-- for arrows
+</AnimationContainer> 1).
+
+*/
+
+.tokenBase {
+  appearance: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 2px;
+  cursor: pointer;
+  user-select: none;
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+  transition: background-color 0.15s ease-in-out, color 0.15;
+  display: inline-block;
+}
+
+.tokenRHS {
+  width: 80px;
+  height: 20px;
+  font-size: 0.75rem;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.animationContainer {
+  width: 100%;
+  position: relative;
+  display: flex;
+  aspect-ratio: 2 / 1;
+}
+
+/* Defined Initially for Mobile */
+.contentContainer {
+  position: absolute;
+  display: flex;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 8px;
+}
+
+/* Check These - Define here for mobile*/
+.lhsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  justify-content: flex-start; /* Align to left */
+  align-items: center; /* Center vertically with RHS tokens */
+  gap: 8px;
+}
+
+/* Should be nearly the same between desktop and mobile */
+.promptDisplayContainer {
+  /* Set a specific, non-fluid width */
+  max-width: 300px;
+  width: 100%;
+  /* Enables horizontal scrolling when content exceeds the width */
+  overflow-x: auto;
+  overflow-y: hidden; /* Prevent vertical scrollbar */
+  border: 1px solid hsl(var(--border));
+
+  /* Forces tokens to stay on a single line */
+  white-space: nowrap;
+  background-color: hsl(var(--background-muted));
+
+  /* Adjustments from previous structure */
+  max-height: 100%; /* Still good for vertical containment */
+  padding: 8px; /* Increased padding for better spacing */
+  border-radius: 6px; /* Add rounded corners */
+
+  /* Custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.promptDisplayContainer::-webkit-scrollbar {
+  height: 6px;
+}
+
+.promptDisplayContainer::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.promptDisplayContainer::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+.promptDisplayContainer::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+.promptDisplayWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 300px;
+  width: 100%;
+  align-self: center; /* Center within parent flex container */
+}
+
+.promptDisplayLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  margin-bottom: 4px;
+}
+
+/* Check These - Define here for mobile */
+.rhsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.tokenMapContainer {
+  display: flex;
+  justify-items: right;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tokenMapItem {
+  /* Make each item stretch across the container */
+  width: 100px;
+  display: flex; /* Use Flexbox to separate Token and Probability */
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Match size to .contentContainer */
+.svgOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  stroke: red; /* For debugging, change or remove later */
+  stroke-width: 1px;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .contentContainer {
+    flex-direction: row;
+    align-items: stretch;
+    height: 100%;
+    padding: 16px;
+  }
+
+  .lhsContainer {
+    justify-content: flex-start; /* Align to left */
+    flex: 1;
+    max-height: 100%;
+    align-items: center;
+    padding-left: 16px;
+  }
+
+  .rhsContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    margin-top: 0;
+  }
+
+  .tokenMapContainer {
+    /* Switch to a true Grid layout for visual organization */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    width: 300px; /* Don't stretch to full width */
+    max-width: 300px; /* Limit the width */
+  }
+
+  .tokenMapItem {
+    /* Each item is a card in the grid */
+    flex-direction: row; /* Stack content within the card */
+    justify-content: flex-start;
+  }
+
+  .probBarFill {
+    /* Must be a block element to respect width/height */
+    height: 100%;
+
+    /* Visual style for the filled portion */
+    background-color: hsl(var(--primary)); /* Use a high-contrast color */
+
+    /* Smooth the transition when the probability value updates */
+    transition: width 0.3s ease-in-out;
+  }
+
+  .probBarContainer {
+    /* Set maximum size relative to the card/tokenMapItem */
+    width: 100px; /* Take up most of the available width */
+    height: 6px; /* Fixed height for visual consistency */
+
+    /* Background representing the 100% boundary */
+    background-color: hsl(var(--border));
+    border-radius: 2px;
+    overflow: hidden; /* Ensures the fill doesn't escape the container */
+    margin-top: 5px; /* Spacing below the token text */
+  }
+}
