@@ -1,0 +1,31 @@
+.container {
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 80vw;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px;
+  /* Use the global radius variable */
+  border-radius: var(--radius);
+  font-size: 16px;
+  margin-top: 10px;
+  box-sizing: border-box;
+
+  /* Use global theme variables for colors */
+  background-color: hsl(var(--input));
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+
+  /* Optional: Prevent the user from resizing the box in the browser */
+  resize: vertical;
+}
+
+.textarea:focus {
+  /* Use the global ring variable for a consistent focus look */
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}

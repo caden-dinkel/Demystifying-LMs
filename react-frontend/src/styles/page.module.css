@@ -1,0 +1,107 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6rem;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  margin-top: 10px;
+  box-sizing: border-box;
+  background-color: #333333; /* Dark grey background */
+  color: #ededed; /* Light grey text */
+  border: 1px solid #555555; /* Matching border */
+}
+
+.button {
+  background-color: #4a4a8a;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  width: 150px;
+}
+
+.button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.resultBox {
+  margin-top: 10px;
+  padding: 15px;
+  border-radius: 5px;
+  white-space: pre-wrap;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #333333; /* Dark grey background */
+  color: #ededed; /* Light grey text */
+  border: 1px solid #555555; /* Matching border */
+}
+
+.section {
+  width: 100%;
+  padding: 2rem;
+  margin-top: 2rem;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tokenizerOutput {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.token {
+  background-color: #4a4e69;
+  color: #f2e9e4;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.probabilities ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.probabilities li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.tokenPrediction {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.probability {
+  color: #c9ada7;
+}
