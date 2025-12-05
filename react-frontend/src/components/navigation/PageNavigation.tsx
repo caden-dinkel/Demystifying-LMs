@@ -1,12 +1,10 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
@@ -36,22 +34,18 @@ export const PageNavigation: React.FC<PageNavigationProps> = ({
         <PaginationContent>
           {previousPage && (
             <PaginationItem>
-              <Link href={previousPage.href} passHref legacyBehavior>
-                <PaginationPrevious>
-                  <span className="sr-only">Previous: </span>
-                  {previousPage.label}
-                </PaginationPrevious>
-              </Link>
+              <PaginationPrevious href={previousPage.href}>
+                <span className="sr-only">Previous: </span>
+                {previousPage.label}
+              </PaginationPrevious>
             </PaginationItem>
           )}
           {nextPage && (
             <PaginationItem>
-              <Link href={nextPage.href} passHref legacyBehavior>
-                <PaginationNext>
-                  <span className="sr-only">Next: </span>
-                  {nextPage.label}
-                </PaginationNext>
-              </Link>
+              <PaginationNext href={nextPage.href}>
+                <span className="sr-only">Next: </span>
+                {nextPage.label}
+              </PaginationNext>
             </PaginationItem>
           )}
         </PaginationContent>

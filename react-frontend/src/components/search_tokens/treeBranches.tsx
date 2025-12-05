@@ -1,9 +1,6 @@
 import { ArrowConnector } from "./ArrowConnector";
 
 export interface SearchTreeConnectorProps {
-  rhsBoxes: DOMRect[];
-  lhsBox: DOMRect;
-  parentRect: DOMRect | null;
   animatingTokenIndex?: number | null;
 }
 
@@ -12,17 +9,7 @@ export interface SearchTreeConnectorProps {
  * Uses the ArrowConnector component for D3 rendering while keeping structure as React
  */
 export const SearchTreeConnector = ({
-  rhsBoxes,
-  lhsBox,
-  parentRect,
   animatingTokenIndex = null,
 }: SearchTreeConnectorProps) => {
-  return (
-    <ArrowConnector
-      lhsBox={lhsBox}
-      rhsBoxes={rhsBoxes}
-      parentRect={parentRect}
-      animatingTokenIndex={animatingTokenIndex}
-    />
-  );
+  return <ArrowConnector animatingTokenIndex={animatingTokenIndex} />;
 };

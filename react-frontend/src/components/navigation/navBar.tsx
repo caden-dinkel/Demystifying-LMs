@@ -30,7 +30,6 @@ const WorkNavLinks: NavLink[] = [
   { name: "Tokenizing Text", href: "/lms_work/encode_tokens" },
   { name: "Predicting Next Token", href: "/lms_work/predict_next" },
   { name: "Searching for Words", href: "/lms_work/decode_tokens" },
-  { name: "Searching for Words (D3)", href: "/lms_work/decode_tokens_d3" },
 ];
 
 const TrainedNavLinks: NavLink[] = [
@@ -45,9 +44,6 @@ const TrainedNavLinks: NavLink[] = [
 const UsedNavLinks: NavLink[] = [
   { name: "How LMs Are Used", href: "/lms_used" },
   { name: "Planning with LMs", href: "/lms_used/planning" },
-  { name: "Getting Better Answers", href: "/lms_used/lm_prompt_engineering" },
-  { name: "Smart Home Planner", href: "/lms_used/smart_home_planner" },
-  { name: "Playing Chess", href: "/lms_used/lm_chess" },
 ];
 
 // Combined navigation items data structure

@@ -4,11 +4,34 @@ import * as d3 from "d3";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { useLMSettings } from "@/components/settings/lmSettingsProvider";
 import { SearchTreeProvider, useSearchTree } from "./useSearchTree";
-import styles from "../../styles/search-tree.module.css";
+import styles from "@/styles/search-tree.module.css";
 
 export interface UserSearchTreeD3Props {
   initialPrompt: string;
 }
+
+// Helper function to normalize probabilities for top 5 tokens
+const normalizeTopTokens = (
+  tokens: string[],
+  probabilities: number[],
+  tokenIds: number[],
+  topK: number = 5
+) => {
+  // Take only top K tokens
+  const topTokens = tokens.slice(0, topK);
+  const topProbs = probabilities.slice(0, topK);
+  const topIds = tokenIds.slice(0, topK);
+
+  // Normalize probabilities to sum to 1
+  const sum = topProbs.reduce((acc, prob) => acc + prob, 0);
+  const normalizedProbs = topProbs.map((prob) => prob / sum);
+
+  return {
+    tokens: topTokens,
+    probabilities: normalizedProbs,
+    tokenIds: topIds,
+  };
+};
 
 interface D3Node {
   id: string;
@@ -141,15 +164,20 @@ const UserSearchTreeD3Content = () => {
 
       try {
         const data = await getTokenProbabilities(promptForApi, selectedLM);
+        const normalized = normalizeTopTokens(
+          data.tokens,
+          data.probabilities,
+          data.token_ids
+        );
         const currentPathEndId = searchPath[searchPath.length - 1];
 
         deselectNode(currentPathEndId);
         selectNode(nodeId);
         addChildrenToNode(
           nodeId,
-          data.tokens,
-          data.probabilities,
-          data.token_ids
+          normalized.tokens,
+          normalized.probabilities,
+          normalized.tokenIds
         );
         moveToNode(nodeId);
       } catch (error) {
@@ -548,7 +576,12 @@ export const UserSearchTreeD3 = ({ initialPrompt }: UserSearchTreeD3Props) => {
     ) => {
       try {
         const data = await getTokenProbabilities(prompt, selectedLM);
-        addChildren(data.tokens, data.probabilities);
+        const normalized = normalizeTopTokens(
+          data.tokens,
+          data.probabilities,
+          data.token_ids
+        );
+        addChildren(normalized.tokens, normalized.probabilities);
       } catch (error) {
         console.error("Error fetching initial tokens:", error);
       }

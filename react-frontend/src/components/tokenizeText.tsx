@@ -1,40 +1,44 @@
+"use client";
 import { useState } from "react";
 import { Token } from "@/utilities/types";
 import { postTokenizeText } from "@/api/postTokenizeText";
-import styles from "@/app/page.module.css";
-import { Button } from "./ui/button";
+import styles from "@/styles/page.module.css";
+import { LMTextarea, ExamplePromptButton } from "./lmTextarea";
 
 export const Tokenizer = () => {
   const [tokenizedOutput, setTokenizedOutput] = useState<Token[]>();
-  const [prompt, setPrompt] = useState("");
-  const handleTokenize = async () => {
+
+  const handleTokenize = async (prompt: string, modelName: string) => {
     if (!prompt) {
       alert("Please enter a prompt!");
       return;
     }
     try {
-      const data = await postTokenizeText(prompt, "gpt2");
+      const data = await postTokenizeText(prompt, modelName);
       console.log(data);
       setTokenizedOutput(data);
     } catch (error) {
       console.error("Error Tokenizing Text:", error);
     }
   };
+
   return (
     <div className={styles.section}>
       <h2>2. Visual Tokenizer</h2>
-      <p>
-        Enter any text to see how the GPT-2 model breaks it down into tokens.
-      </p>
-      <textarea
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
+      <p>Enter any text to see how the model breaks it down into tokens.</p>
+
+      <LMTextarea
+        onSend={handleTokenize}
         placeholder="Once upon a time..."
-        rows={4}
-        className={styles.textarea}
+        exampleButton={
+          <ExamplePromptButton
+            setInputValue={(_) => {}}
+            disabled={false}
+            exampleText="Once upon a time"
+          />
+        }
       />
 
-      <Button onClick={handleTokenize} className={styles.button} />
       {tokenizedOutput && (
         <div className={styles.tokenizerOutput}>
           {tokenizedOutput.map((token) => (

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLMSettings } from "@/components/settings/lmSettingsProvider";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { Loader2 } from "lucide-react";
+import styles from "@/styles/token-prediction.module.css";
 
 interface TokenPrediction {
   token: string;
@@ -63,13 +64,13 @@ export const TokenPredictionAnimation: React.FC = () => {
   }, [inputText, fetchPredictions]);
 
   return (
-    <Card className="w-full max-w-4xl mx-auto my-6">
+    <Card className={styles.container}>
       <CardHeader>
         <CardTitle>Live Token Prediction</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className={styles.labelText}>
             Enter text to see next token predictions:
           </label>
           <Input
@@ -81,46 +82,44 @@ export const TokenPredictionAnimation: React.FC = () => {
         </div>
 
         {isLoading && (
-          <div className="flex items-center justify-center py-8">
+          <div className={styles.loadingContainer}>
             <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-            <span className="ml-2 text-sm text-gray-600">
+            <span className={styles.loadingText}>
               Calculating predictions...
             </span>
           </div>
         )}
 
-        {error && <div className="text-red-500 text-sm py-2">{error}</div>}
+        {error && <div className={styles.errorText}>{error}</div>}
 
         {!isLoading && !error && predictions.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <h3 className={styles.predictionsTitle}>
               Most Likely Next Tokens:
             </h3>
-            <div className="space-y-2">
+            <div className={styles.predictionsList}>
               {predictions.map((pred, idx) => (
                 <div
                   key={`${pred.token_id}-${idx}`}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-900/20 transition-all duration-300 hover:shadow-md"
+                  className={styles.predictionItem}
                   style={{
-                    animation: `fadeIn 0.3s ease-out ${idx * 0.05}s both`,
+                    animationDelay: `${idx * 0.05}s`,
                   }}
                 >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm">
-                    {idx + 1}
-                  </div>
-                  <div className="flex-grow">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono text-lg font-semibold text-gray-800 dark:text-gray-200">
+                  <div className={styles.rankBadge}>{idx + 1}</div>
+                  <div className={styles.predictionContent}>
+                    <div className={styles.predictionHeader}>
+                      <span className={styles.tokenText}>
                         "{pred.token.replace(/Ġ/g, " ").replace(/\u0120/g, " ")}
                         "
                       </span>
-                      <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                      <span className={styles.probabilityText}>
                         {(pred.probability * 100).toFixed(2)}%
                       </span>
                     </div>
-                    <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div className={styles.progressBarBackground}>
                       <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
+                        className={styles.progressBarFill}
                         style={{
                           width: `${pred.probability * 100}%`,
                         }}
@@ -137,23 +136,8 @@ export const TokenPredictionAnimation: React.FC = () => {
           !error &&
           predictions.length === 0 &&
           inputText.trim() && (
-            <div className="text-center py-8 text-gray-500">
-              No predictions available
-            </div>
+            <div className={styles.emptyState}>No predictions available</div>
           )}
-
-        <style jsx>{`
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}</style>
       </CardContent>
     </Card>
   );

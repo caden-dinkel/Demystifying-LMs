@@ -7,7 +7,6 @@ import React from "react";
 export interface PromptDisplayProps {
   currentTokens: TokenData[];
   onNodeClick: (selectedNodeId: string) => void;
-  onContainerRender?: (containerRect: DOMRect) => void;
 }
 
 /**
@@ -17,18 +16,8 @@ export interface PromptDisplayProps {
 export const PromptDisplay: React.FC<PromptDisplayProps> = ({
   currentTokens,
   onNodeClick,
-  onContainerRender,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Update callback - memoized to avoid unnecessary updates
-  const notifyContainerRender = useCallback(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const rect = container.getBoundingClientRect();
-    if (onContainerRender) onContainerRender(rect);
-  }, [onContainerRender]);
 
   useEffect(() => {
     // Scroll to the last token
@@ -38,25 +27,16 @@ export const PromptDisplay: React.FC<PromptDisplayProps> = ({
       block: "nearest",
       inline: "end",
     });
-
-    // Notify parent of container dimensions
-    notifyContainerRender();
-  }, [currentTokens, notifyContainerRender]);
-
-  // Also update on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      notifyContainerRender();
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [notifyContainerRender]);
+  }, [currentTokens]);
 
   return (
     <div className={styles.promptDisplayWrapper}>
       <label className={styles.promptDisplayLabel}>Current Prompt</label>
-      <div className={styles.promptDisplayContainer} ref={containerRef}>
+      <div
+        id="search-tree-prompt"
+        className={styles.promptDisplayContainer}
+        ref={containerRef}
+      >
         {currentTokens.map((tokenData) => (
           <PromptToken
             key={tokenData.id}

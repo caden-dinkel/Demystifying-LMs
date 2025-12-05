@@ -1,7 +1,6 @@
 // tokenChip.tsx
 "use client";
 
-import { useEffect } from "react";
 import React, { useRef } from "react";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -19,7 +18,6 @@ export interface TokenChipProps extends ButtonProps {
   prob: number; // Probability from 0.0 to 1.0
   token_id?: number; // Optional token ID
   onSelection: (selectedToken: string, startCoords: DOMRect) => void;
-  onRender?: (DOMRect: DOMRect) => void;
 }
 
 export const TokenChip = ({
@@ -28,7 +26,6 @@ export const TokenChip = ({
   prob,
   token_id,
   onSelection,
-  onRender,
   className,
   ...props
 }: TokenChipProps) => {
@@ -40,13 +37,6 @@ export const TokenChip = ({
       onSelection(id, startCoords);
     }
   };
-
-  useEffect(() => {
-    if (onRender && buttonRef.current) {
-      const domRect = buttonRef.current.getBoundingClientRect();
-      onRender(domRect);
-    }
-  }, [id, onRender]);
 
   return (
     <div className="flex flex-col gap-1 w-full">
