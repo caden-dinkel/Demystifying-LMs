@@ -26,18 +26,24 @@ interface NavItem extends NavLink {
 
 // Data for sub-links
 const WorkNavLinks: NavLink[] = [
+  { name: "How LMs Work", href: "/lms_work" },
   { name: "Tokenizing Text", href: "/lms_work/encode_tokens" },
-  { name: "Predicting Next Word", href: "/lms_work/predict_next" },
+  { name: "Predicting Next Token", href: "/lms_work/predict_next" },
   { name: "Searching for Words", href: "/lms_work/decode_tokens" },
-  { name: "Searching for Words (D3)", href: "/lms_work/decode_tokens_d3" },
-  { name: "Sequential Generation", href: "/lms_work/sequential_generation" },
+];
+
+const TrainedNavLinks: NavLink[] = [
+  { name: "How LMs Are Trained", href: "/lms_trained" },
+  { name: "Big Data", href: "/lms_trained/big_data" },
+  {
+    name: "Supervised Fine-tuning",
+    href: "/lms_trained/supervised_finetuning",
+  },
 ];
 
 const UsedNavLinks: NavLink[] = [
-  { name: "Getting Better Answers", href: "/lms_used/lm_prompt_engineering" },
-  { name: "Acting as a Planner", href: "/lms_used/lm_planning" },
-  { name: "Smart Home Planner", href: "/lms_used/smart_home_planner" },
-  { name: "Playing Chess", href: "/lms_used/lm_chess" },
+  { name: "How LMs Are Used", href: "/lms_used" },
+  { name: "Planning with LMs", href: "/lms_used/planning" },
 ];
 
 // Combined navigation items data structure
@@ -47,6 +53,11 @@ const NavItems: NavItem[] = [
     name: "How Language Models Work",
     href: "/lms_work",
     subOptions: WorkNavLinks,
+  },
+  {
+    name: "How Language Models Are Trained",
+    href: "/lms_trained",
+    subOptions: TrainedNavLinks,
   },
   {
     name: "How Language Models Are Used",

@@ -34,11 +34,6 @@ export const LMSelector = ({ selectedLM, onLMChange }: LMSelectorProps) => {
             <span className="inline-block h-3 w-px bg-gray-400 mx-2 align-middle" />
             Query Response
           </SelectItem>
-          <SelectItem value={CHESS_LLAMA_LM}>
-            Chess-Llama
-            <span className="inline-block h-3 w-px bg-gray-400 mx-2 align-middle" />
-            Chess Moves
-          </SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

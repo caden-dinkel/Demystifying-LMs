@@ -1,0 +1,155 @@
+/* Token Prediction Animation Styles */
+
+.container {
+  width: 100%;
+  max-width: 64rem;
+  margin: 1.5rem auto;
+}
+
+.labelText {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.darkLabelText {
+  color: #d1d5db;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.loadingText {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+}
+
+.predictionsTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.darkPredictionsTitle {
+  color: #d1d5db;
+}
+
+.predictionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.predictionItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(to right, #eff6ff, transparent);
+  transition: all 0.3s;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.predictionItem:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.darkPredictionItem {
+  background: linear-gradient(to right, rgba(30, 58, 138, 0.2), transparent);
+}
+
+.rankBadge {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background-color: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.predictionContent {
+  flex-grow: 1;
+}
+
+.predictionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.tokenText {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.darkTokenText {
+  color: #e5e7eb;
+}
+
+.probabilityText {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.darkProbabilityText {
+  color: #60a5fa;
+}
+
+.progressBarBackground {
+  width: 100%;
+  height: 0.5rem;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.darkProgressBarBackground {
+  background-color: #374151;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  border-radius: 9999px;
+  transition: width 0.5s;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 2rem 0;
+  color: #6b7280;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

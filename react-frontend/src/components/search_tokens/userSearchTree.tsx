@@ -1,10 +1,9 @@
 //tokenSearching.tsx
 import styles from "@/styles/tokens.module.css";
 import React from "react";
-import { useRef, useEffect, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { getTokenProbabilities } from "@/api/getTokenProbs";
 import { useLMSettings } from "@/components/settings/lmSettingsProvider";
-import { useConnectorLayout } from "./useConnectorLayout";
 import { SearchTreeProvider, useSearchTree } from "./useSearchTree";
 import { PromptDisplay } from "./promptDisplay";
 import { SearchTreeConnector } from "./treeBranches";
@@ -18,14 +17,6 @@ export interface TokenSearchProps {
 // Inner component that uses the context
 const TokenSearchContent = () => {
   const { selectedLM } = useLMSettings();
-  const {
-    lhsBox,
-    rhsBoxes,
-    parentContainer,
-    handleLHSTokenRender,
-    handleRHSTokenRender,
-    setParentContainer,
-  } = useConnectorLayout();
 
   const {
     lhsTokenData,
@@ -42,27 +33,9 @@ const TokenSearchContent = () => {
     getNodeById,
   } = useSearchTree();
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const [animatingTokenIndex, setAnimatingTokenIndex] = useState<number | null>(
     null
   );
-
-  // Update parent container rect when component mounts or layout changes
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const updateRect = () => {
-      const rect = container.getBoundingClientRect();
-      setParentContainer(rect);
-    };
-
-    updateRect();
-
-    // Update on resize or when tokens change
-    window.addEventListener("resize", updateRect);
-    return () => window.removeEventListener("resize", updateRect);
-  }, [setParentContainer, lhsTokenData.length, rhsTokenData.length]);
 
   // Handler for clicking a token on the rhs (USER-DRIVEN API CALL)
   const handleNextToken = useCallback(
@@ -138,41 +111,27 @@ const TokenSearchContent = () => {
   );
 
   return (
-    <div
-      className={styles.animationContainer}
-      ref={containerRef}
-      data-search-tree-container
-    >
+    <div className={styles.animationContainer} data-search-tree-container>
       {/* Draggable Generated Text Box */}
       <GeneratedTextBox text={buildPromptFromPath()} />
 
       <div className={styles.contentContainer}>
         <div className={styles.lhsContainer}>
-          {rhsBoxes.length > 0 && (
+          {rhsTokenData.length > 0 && (
             <PromptDisplay
               currentTokens={lhsTokenData}
               onNodeClick={handlePrevNode}
-              onContainerRender={handleLHSTokenRender}
             />
           )}
         </div>
         <div className={styles.rhsContainer}>
-          <div className={styles.tokenMapContainer}>
-            <TokenMap
-              tokenData={rhsTokenData}
-              onSelection={handleNextToken}
-              onRender={handleRHSTokenRender}
-            />
+          <div id="search-tree-tokens" className={styles.tokenMapContainer}>
+            <TokenMap tokenData={rhsTokenData} onSelection={handleNextToken} />
           </div>
         </div>
       </div>
-      {lhsBox && rhsBoxes.length > 0 && parentContainer && (
-        <SearchTreeConnector
-          lhsBox={lhsBox}
-          rhsBoxes={rhsBoxes}
-          parentRect={parentContainer}
-          animatingTokenIndex={animatingTokenIndex}
-        />
+      {rhsTokenData.length > 0 && (
+        <SearchTreeConnector animatingTokenIndex={animatingTokenIndex} />
       )}
     </div>
   );

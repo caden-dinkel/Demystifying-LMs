@@ -4,6 +4,7 @@ import Navbar from "@/components/navigation/navBar";
 import React from "react";
 import { StepTokenGen } from "@/components/search_tokens/stepGeneration";
 import styles from "@/styles/main-layout.module.css";
+import { PageNavigation } from "@/components/navigation/PageNavigation";
 
 export default function TokenizeText() {
   return (
@@ -17,17 +18,30 @@ export default function TokenizeText() {
           <h1 className="text-3xl font-bold tracking-tight mb-2">
             How Language Models Work
           </h1>
-          <p className="text-muted-foreground mb-4">
-            Future implementation: This page will provide a high-level overview
-            of language model components and how they interact to generate text.
-          </p>
-          <div className="p-6 border rounded-lg bg-muted/50">
-            <p className="text-sm text-muted-foreground italic">
-              🚧 Coming soon: Interactive overview of LM architecture and
-              workflow
+          <article className="prose lg:prose-lg dark:prose-invert max-w-4xl mb-6">
+            <p>
+              When you give a language model a prompt, it doesn&apos;t just
+              &apos;think&apos; of an answer. Instead it follows a well-defined
+              &apos;generation pipeline&apos; to build its response one piece at
+              a time.
             </p>
-          </div>
+            <p>
+              This process involves two main stages. First, the model has to
+              break down your prompt and its own working response into numbers
+              it can understand. This is the process of generating tokens.
+              Second, it has to algorithmically decide which tokens to bring
+              together to create meaningful and cohering sentences, this is done
+              by searching tokens. This section breaks down both of those steps.
+            </p>
+          </article>
         </div>
+        <StepTokenGen />
+        <PageNavigation
+          nextPage={{
+            href: "/lms_work/encode_tokens",
+            label: "Tokenizing Text",
+          }}
+        />
       </main>
     </>
   );

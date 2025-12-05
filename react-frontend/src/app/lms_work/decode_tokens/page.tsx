@@ -5,184 +5,67 @@ import Navbar from "@/components/navigation/navBar";
 import { LMTextarea, ExamplePromptButton } from "@/components/lmTextarea";
 import { TokenSearch } from "@/components/search_tokens/userSearchTree";
 import { AlgoSearchTreeNew } from "@/components/search_tokens/algoSearchTreeNew";
-import { ConnectorLayoutProvider } from "@/components/search_tokens/useConnectorLayout";
 import { Button } from "@/components/ui/button";
+import { PageNavigation } from "@/components/navigation/PageNavigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
-    PlayIcon,
-    PauseIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
+  PlayIcon,
+  PauseIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "@radix-ui/react-icons";
 import styles from "@/styles/main-layout.module.css";
 
+const searchingTokensContent = `# Searching Tokens
+
+So, the model can predict the probability of the next token. But a full response is a long chain of tokens. How does it decide which chain is best?
+
+This is where search algorithms come in. For example if the model always picked the most probable token at every step, a greedy search, it would probably get stuck in a weird loop or itself into a corner. A strong example of this is actually something you use everyday. Your phone's auto complete is great at picking the next work, but it can't write a creative story.
+
+To create genuinely meaningful language, the model needs to use more advanced algorithms to explore many different 'paths' of tokens. These include algorithms like Beam Search, or sampling methods like Top-k and Top-p (Nucleus) sampling. While these methods are much more complex, they provide a much better result. By looking ahead to find a sequence of words that, as a whole, make the most sense resulting in a high quality coherent response.
+`;
+
 export default function SearchingForWords() {
-    const [prompt, setPrompt] = useState<string>("");
-    const [showTree, setShowTree] = useState<boolean>(false);
-    const [searchMode, setSearchMode] = useState<"manual" | "algorithmic">(
-        "manual"
-    );
+  const [prompt, setPrompt] = useState<string>("");
+  const [showTree, setShowTree] = useState<boolean>(false);
 
-    const handleStartSearch = useCallback((userPrompt: string) => {
-        setPrompt(userPrompt);
-        setShowTree(true);
-    }, []);
+  const handleStartSearch = useCallback((userPrompt: string) => {
+    setPrompt(userPrompt);
+    setShowTree(true);
+  }, []);
 
-    return (
-        <div>
-            <Navbar />
-            <main className={styles.baseMain}>
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold tracking-tight mb-2">
-                        Searching for Words
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Explore how language models search through possible tokens to
-                        generate text.
-                    </p>
-                </div>
+  return (
+    <div>
+      <Navbar />
+      <main className={styles.baseMain}>
+        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl mb-8">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {searchingTokensContent}
+          </ReactMarkdown>
+        </article>
 
-                {/* Mode Toggle */}
-                <div className="mb-4 flex gap-2">
-                    <Button
-                        onClick={() => setSearchMode("manual")}
-                        variant={searchMode === "manual" ? "default" : "outline"}
-                    >
-                        Manual Selection
-                    </Button>
-                    <Button
-                        onClick={() => setSearchMode("algorithmic")}
-                        variant={searchMode === "algorithmic" ? "default" : "outline"}
-                    >
-                        Algorithmic Search
-                    </Button>
-                </div>
+        <LMTextarea
+          onSend={handleStartSearch}
+          exampleButton={
+            <ExamplePromptButton
+              setInputValue={(_) => {}}
+              disabled={false}
+              exampleText={"The capital of France is"}
+            />
+          }
+        />
 
-                <LMTextarea
-                    onSend={handleStartSearch}
-                    exampleButton={
-                        <ExamplePromptButton
-                            setInputValue={(_) => { }}
-                            disabled={false}
-                            exampleText={"The capital of France is"}
-                        />
-                    }
-                />
-
-                {showTree && (
-                    <ConnectorLayoutProvider>
-                        {searchMode === "manual" ? (
-                            <TokenSearch key={`manual-${prompt}`} initialPrompt={prompt} />
-                        ) : (
-                            <AlgoSearchTreeNew
-                                key={`algo-${prompt}`}
-                                initialPrompt={prompt}
-                                autoStart={true}
-                                renderControls={({
-                                    isAutoPlay,
-                                    setIsAutoPlay,
-                                    isPlaying,
-                                    handlePlayPause,
-                                    handleStepForward,
-                                    handleStepBackward,
-                                    currentStepIndex,
-                                    totalSteps,
-                                    isProcessingStep,
-                                }: {
-                                    isAutoPlay: boolean;
-                                    setIsAutoPlay: (value: boolean) => void;
-                                    isPlaying: boolean;
-                                    handlePlayPause: () => void;
-                                    handleStepForward: () => void;
-                                    handleStepBackward: () => void;
-                                    currentStepIndex: number;
-                                    totalSteps: number;
-                                    isProcessingStep: boolean;
-                                }) => (
-                                    <div
-                                        style={{
-                                            marginBottom: "1rem",
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            gap: "0.75rem",
-                                            padding: "0.5rem",
-                                            background: "#f9fafb",
-                                            borderRadius: "0.375rem",
-                                            border: "1px solid #e5e7eb",
-                                        }}
-                                    >
-                                        <div
-                                            style={{
-                                                fontSize: "0.875rem",
-                                                color: "#666",
-                                            }}
-                                        >
-                                            Step {currentStepIndex} / {totalSteps}
-                                        </div>
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                gap: "0.5rem",
-                                                alignItems: "center",
-                                            }}
-                                        >
-                                            <Button
-                                                onClick={() => setIsAutoPlay(!isAutoPlay)}
-                                                variant={isAutoPlay ? "default" : "outline"}
-                                                size="sm"
-                                            >
-                                                {isAutoPlay ? "Auto" : "Manual"}
-                                            </Button>
-                                            {isAutoPlay ? (
-                                                <Button
-                                                    onClick={handlePlayPause}
-                                                    variant="outline"
-                                                    size="sm"
-                                                    disabled={isProcessingStep}
-                                                >
-                                                    {isPlaying ? (
-                                                        <>
-                                                            <PauseIcon className="mr-2 h-4 w-4" />
-                                                            Pause
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <PlayIcon className="mr-2 h-4 w-4" />
-                                                            Play
-                                                        </>
-                                                    )}
-                                                </Button>
-                                            ) : (
-                                                <>
-                                                    <Button
-                                                        onClick={handleStepBackward}
-                                                        variant="outline"
-                                                        size="sm"
-                                                        disabled={
-                                                            currentStepIndex === 0 || isProcessingStep
-                                                        }
-                                                    >
-                                                        <ChevronLeftIcon className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        onClick={handleStepForward}
-                                                        variant="outline"
-                                                        size="sm"
-                                                        disabled={
-                                                            currentStepIndex >= totalSteps || isProcessingStep
-                                                        }
-                                                    >
-                                                        <ChevronRightIcon className="h-4 w-4" />
-                                                    </Button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            />
-                        )}
-                    </ConnectorLayoutProvider>
-                )}
-            </main>
-        </div>
-    );
+        {showTree && (
+          <TokenSearch key={`manual-${prompt}`} initialPrompt={prompt} />
+        )}
+        <PageNavigation
+          previousPage={{
+            href: "/lms_work/predict_next",
+            label: "Predicting Next Token",
+          }}
+        />
+      </main>
+    </div>
+  );
 }
