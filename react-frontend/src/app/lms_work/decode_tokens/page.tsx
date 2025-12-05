@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import Navbar from "@/components/navigation/navBar";
 import { LMTextarea, ExamplePromptButton } from "@/components/lmTextarea";
 import { TokenSearch } from "@/components/search_tokens/userSearchTree";
-import { AlgoSearchTreeNew } from "@/components/search_tokens/algoSearchTreeNew";
 import { Button } from "@/components/ui/button";
 import { PageNavigation } from "@/components/navigation/PageNavigation";
 import ReactMarkdown from "react-markdown";
@@ -38,8 +37,8 @@ export default function SearchingForWords() {
   return (
     <div>
       <Navbar />
-      <main className={styles.baseMain}>
-        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl mb-8">
+          <main className={styles.baseMain}>
+        <article className="prose lg:prose-xl dark:prose-invert max-w-100vw mb-8">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {searchingTokensContent}
           </ReactMarkdown>

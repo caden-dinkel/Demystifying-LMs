@@ -3,7 +3,7 @@
   /* Shared Layout Styles for ALL pages */
   flex-grow: 1; /* Makes sure the main content fills the available height */
   padding: 2rem 4rem; /* Consistent padding around the content */
-  margin: 0 auto; /* Center the content area */
-  max-width: 90vw; /* Limit the width for readability */
+  margin: auto;
+  max-width: 90vw;
   width: 100%;
 }
