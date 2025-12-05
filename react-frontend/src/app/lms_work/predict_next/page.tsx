@@ -1,10 +1,31 @@
-"use client";
-
 import Navbar from "@/components/navigation/navBar";
 import React from "react";
 import styles from "@/styles/main-layout.module.css";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import fs from "fs";
+import path from "path";
+import { TokenPredictionAnimation } from "@/components/TokenPredictionAnimation";
+import { PageNavigation } from "@/components/navigation/PageNavigation";
 
 export default function PredictNext() {
+  // Construct the full path to the .md file
+  const mdFilePath = path.join(
+    process.cwd(),
+    "src",
+    "app",
+    "content",
+    "token_generation.md"
+  );
+
+  let content = "Error: token_generation.md file not found.";
+
+  try {
+    content = fs.readFileSync(mdFilePath, "utf8");
+  } catch (err) {
+    console.error(err);
+  }
+
   return (
     <>
       {/* 1. Navbar (Navigation, outside the main content) */}
@@ -12,20 +33,20 @@ export default function PredictNext() {
 
       {/* 2. Main Content (The unique part of this page) */}
       <main className={styles.baseMain}>
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">
-            Predict Next Token
-          </h1>
-          <p className="text-muted-foreground mb-4">
-            Future implementation: This page will demonstrate how language
-            models predict the next token given a sequence of input tokens.
-          </p>
-          <div className="p-6 border rounded-lg bg-muted/50">
-            <p className="text-sm text-muted-foreground italic">
-              🚧 Coming soon: Interactive next token prediction visualization
-            </p>
-          </div>
-        </div>
+        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl mb-6">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        </article>
+        <TokenPredictionAnimation />
+        <PageNavigation
+          previousPage={{
+            href: "/lms_work/encode_tokens",
+            label: "Tokenizing Text",
+          }}
+          nextPage={{
+            href: "/lms_work/decode_tokens",
+            label: "Searching for Words",
+          }}
+        />
       </main>
     </>
   );

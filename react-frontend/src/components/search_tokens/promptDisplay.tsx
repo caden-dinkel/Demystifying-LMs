@@ -1,41 +1,58 @@
 import { TokenData } from "@/utilities/types";
 import styles from "@/styles/tokens.module.css";
 import { PromptToken } from "./promptToken";
-import { useEffect } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import React from "react";
+
 export interface PromptDisplayProps {
   currentTokens: TokenData[];
   onNodeClick: (selectedNodeId: string) => void;
   onContainerRender?: (containerRect: DOMRect) => void;
 }
-export const PromptDisplay = ({
+
+/**
+ * PromptDisplay - React component that displays the current prompt as token chips
+ * Uses callback to notify parent of DOM rect for arrow rendering
+ */
+export const PromptDisplay: React.FC<PromptDisplayProps> = ({
   currentTokens,
   onNodeClick,
   onContainerRender,
-}: PromptDisplayProps) => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    // You can perform any actions with containerRef here if needed
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Update callback - memoized to avoid unnecessary updates
+  const notifyContainerRender = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Small delay to ensure DOM has updated
-    const timer = setTimeout(() => {
-      // OR, if the last token element itself is available:
-      const lastToken = container.lastElementChild;
-      lastToken?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "end",
-      });
+    const rect = container.getBoundingClientRect();
+    if (onContainerRender) onContainerRender(rect);
+  }, [onContainerRender]);
 
-      // 2. CONTAINER RENDER CALLBACK (for SVG calculations)
-      const rect = container.getBoundingClientRect();
-      if (onContainerRender) onContainerRender(rect);
-    }, 0);
+  useEffect(() => {
+    // Scroll to the last token
+    const lastToken = containerRef.current?.lastElementChild;
+    lastToken?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "end",
+    });
 
-    return () => clearTimeout(timer);
-  }, [currentTokens, onContainerRender]); // Changed to trigger on any token change
+    // Notify parent of container dimensions
+    notifyContainerRender();
+  }, [currentTokens, notifyContainerRender]);
+
+  // Also update on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      notifyContainerRender();
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [notifyContainerRender]);
+
   return (
     <div className={styles.promptDisplayWrapper}>
       <label className={styles.promptDisplayLabel}>Current Prompt</label>

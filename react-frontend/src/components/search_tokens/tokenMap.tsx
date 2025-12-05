@@ -2,7 +2,7 @@
 
 import { TokenChip } from "@/components/search_tokens/tokenChip";
 import { TokenData } from "@/utilities/types";
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useEffect, useCallback, useMemo } from "react";
 
 export interface TokenMapProps extends React.HTMLAttributes<HTMLDivElement> {
   tokenData: TokenData[];
@@ -10,20 +10,23 @@ export interface TokenMapProps extends React.HTMLAttributes<HTMLDivElement> {
   onRender: (domRects: DOMRect[]) => void;
 }
 
+/**
+ * TokenMap - React component that displays tokens as chips
+ * Collects DOM rects and notifies parent when layout is ready
+ */
 export const TokenMap = React.memo(
   ({ tokenData, onSelection, onRender }: TokenMapProps) => {
-    const collectedRectsRef = useRef<DOMRect[]>([]);
-    const [renderCount, setRenderCount] = useState(0);
+    const collectedRectsRef = useRef<Map<string, DOMRect>>(new Map());
 
-    // Stable callback that doesn't change between renders
+    // Callback when individual chip renders
     const handleChipRender = useCallback(
-      (domRect: DOMRect) => {
-        collectedRectsRef.current.push(domRect);
+      (tokenId: string, domRect: DOMRect) => {
+        collectedRectsRef.current.set(tokenId, domRect);
 
         // When we've collected all rects, notify parent
-        if (collectedRectsRef.current.length === tokenData.length) {
-          onRender(collectedRectsRef.current);
-          collectedRectsRef.current = []; // Clear for next update
+        if (collectedRectsRef.current.size === tokenData.length) {
+          const rects = Array.from(collectedRectsRef.current.values());
+          onRender(rects);
         }
       },
       [tokenData.length, onRender]
@@ -31,13 +34,13 @@ export const TokenMap = React.memo(
 
     // Reset collected rects when tokenData changes
     useEffect(() => {
-      collectedRectsRef.current = [];
-      setRenderCount((prev) => prev + 1); // Force re-render of chips
+      collectedRectsRef.current.clear();
     }, [tokenData]);
 
-    return (
-      <>
-        {tokenData.map((token) => (
+    // Memoize the rendered chips to avoid unnecessary re-renders
+    const renderedChips = useMemo(
+      () =>
+        tokenData.map((token) => (
           <TokenChip
             id={token.id}
             key={token.id}
@@ -45,12 +48,16 @@ export const TokenMap = React.memo(
             prob={token.prob}
             token_id={token.token_id}
             onSelection={onSelection}
-            onRender={handleChipRender}
+            onRender={(rect) => handleChipRender(token.id, rect)}
             size="sm"
             variant="secondary"
           />
-        ))}
-      </>
+        )),
+      [tokenData, onSelection, handleChipRender]
     );
+
+    return <div style={{ display: "contents" }}>{renderedChips}</div>;
   }
 );
+
+TokenMap.displayName = "TokenMap";

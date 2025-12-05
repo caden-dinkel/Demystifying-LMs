@@ -1,52 +1,43 @@
 import Navbar from "@/components/navigation/navBar";
 import React from "react";
-import { Tokenizer } from "@/components/tokenizeText";
 import styles from "@/styles/main-layout.module.css";
-import { PageNavigation } from "@/components/navigation/PageNavigation";
-
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-
 import fs from "fs";
 import path from "path";
+import { PageNavigation } from "@/components/navigation/PageNavigation";
 
-export default function TokenizeText() {
-  // Construct the full path to the .md file
+export default function SupervisedFinetuning() {
   const mdFilePath = path.join(
     process.cwd(),
     "src",
     "app",
     "content",
-    "text_tokenization.md"
+    "supervised_finetuning.md"
   );
 
-  let content = "Error: text_tokenization.md file not found."; // Default message
+  let content = "Error: supervised_finetuning.md file not found.";
 
   try {
-    // Read the content of the file
     content = fs.readFileSync(mdFilePath, "utf8");
   } catch (err) {
     console.error(err);
   }
+
   return (
     <>
-      {/* 1. Navbar (Navigation, outside the main content) */}
       <Navbar />
-
-      {/* 2. Main Content (The unique part of this page) */}
       <main className={styles.baseMain}>
+        <h1 className="text-3xl font-bold tracking-tight mb-6">
+          Supervised Fine-tuning
+        </h1>
         <article className="prose lg:prose-xl dark:prose-invert max-w-5xl">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </article>
-        <Tokenizer />
         <PageNavigation
           previousPage={{
-            href: "/lms_work",
-            label: "Overview",
-          }}
-          nextPage={{
-            href: "/lms_work/predict_next",
-            label: "Predicting Next Token",
+            href: "/lms_trained/big_data",
+            label: "Big Data",
           }}
         />
       </main>

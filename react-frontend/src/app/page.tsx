@@ -3,13 +3,12 @@
 // This must be a Server Component to read files from the server.
 
 import Navbar from "@/components/navigation/navBar";
+import fs from "fs";
+import path from "path";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import React from "react";
 import styles from "@/styles/main-layout.module.css";
-import { LMTextarea } from "@/components/lmTextarea";
-
-// Import Node.js modules for reading files
-
-// Import the markdown renderer
 
 export default function Home() {
   // Construct the full path to the .md file
@@ -18,11 +17,10 @@ export default function Home() {
     "src",
     "app",
     "content",
-    "home",
-    "tokenizer_ex.md"
+    "home.md"
   );
 
-  let content = "Error: tokenizer.md file not found."; // Default message
+  let content = "Error: home.md file not found."; // Default message
 
   try {
     // Read the content of the file
@@ -34,8 +32,11 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <main className="flex flex-col items-center p-12 md:p-24">
-        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl">
+      <main className={styles.baseMain}>
+        <h1 className="text-4xl font-bold tracking-tight mb-6">
+          Demystifying Language Models
+        </h1>
+        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl mb-8">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </article>
       </main>
