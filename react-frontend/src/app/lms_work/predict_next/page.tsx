@@ -33,7 +33,7 @@ export default function PredictNext() {
 
       {/* 2. Main Content (The unique part of this page) */}
       <main className={styles.baseMain}>
-        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl mb-6">
+        <article className="prose lg:prose-xl dark:prose-invert max-w-7xl mb-6">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </article>
         <TokenPredictionAnimation />

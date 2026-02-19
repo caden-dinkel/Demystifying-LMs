@@ -38,7 +38,7 @@ export default function SearchingForWords() {
     <div>
       <Navbar />
           <main className={styles.baseMain}>
-        <article className="prose lg:prose-xl dark:prose-invert max-w-100vw mb-8">
+        <article className="prose lg:prose-xl dark:prose-invert max-w-7xl mb-8">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {searchingTokensContent}
           </ReactMarkdown>

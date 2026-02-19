@@ -24,6 +24,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/react-use-controllable-state": "^1.2.2",
     "axios": "^1.12.2",
+    "baseline-browser-mapping": "^2.10.0",
     "chess.js": "^1.4.0",
     "chessboardjsx": "^2.4.7",
     "class-variance-authority": "^0.7.1",

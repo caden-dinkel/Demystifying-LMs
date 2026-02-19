@@ -36,7 +36,7 @@ export default function Home() {
         <h1 className="text-4xl font-bold tracking-tight mb-6">
           Demystifying Language Models
         </h1>
-        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl mb-8">
+        <article className="prose lg:prose-xl dark:prose-invert max-w-7xl mb-8">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </article>
       </main>

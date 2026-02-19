@@ -18,7 +18,7 @@ export default function TokenizeText() {
           <h1 className="text-3xl font-bold tracking-tight mb-2">
             How Language Models Work
           </h1>
-          <article className="prose lg:prose-lg dark:prose-invert max-w-4xl mb-6">
+          <article className="prose lg:prose-lg dark:prose-invert max-w-7xl mb-6">
             <p>
               When you give a language model a prompt, it doesn&apos;t just
               &apos;think&apos; of an answer. Instead it follows a well-defined

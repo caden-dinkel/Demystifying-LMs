@@ -35,7 +35,7 @@ export default function TokenizeText() {
 
       {/* 2. Main Content (The unique part of this page) */}
       <main className={styles.baseMain}>
-        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl">
+        <article className="prose lg:prose-xl dark:prose-invert max-w-7xl">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </article>
         <Tokenizer />

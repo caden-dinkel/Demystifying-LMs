@@ -31,7 +31,7 @@ export default function Planning() {
         <h1 className="text-3xl font-bold tracking-tight mb-6">
           Planning with Language Models
         </h1>
-        <article className="prose lg:prose-xl dark:prose-invert max-w-5xl">
+        <article className="prose lg:prose-xl dark:prose-invert max-w-7xl">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </article>
         <PageNavigation
