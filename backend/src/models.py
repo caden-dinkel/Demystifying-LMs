@@ -3,11 +3,24 @@ import torch
 import re
 import json
 
+def _load_gpt2_model():
+    """Load GPT-2 and apply INT8 dynamic quantization."""
+    print("Loading GPT-2 weights...")
+    model = GPT2LMHeadModel.from_pretrained('gpt2')
+    print("Applying INT8 quantization...")
+    quantized = torch.quantization.quantize_dynamic(
+        model,
+        {torch.nn.Linear},
+        dtype=torch.qint8
+    )
+    print("GPT-2 quantization complete.")
+    return quantized
+
 SUPPORTED_MODELS = {
     "GPT-2": {
         "tokenizer": AutoTokenizer.from_pretrained('gpt2'),
-        "model": GPT2LMHeadModel.from_pretrained('gpt2'),
-        "pipeline": pipeline('text-generation', model='gpt2', device=0 if torch.cuda.is_available() else -1) # Use GPU if available
+        "model": _load_gpt2_model(),
+        "pipeline": pipeline('text-generation', model='gpt2', device=0 if torch.cuda.is_available() else -1)
     },
     #"Llama-3.2": {
     #    "tokenizer": AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B-Instruct"),
@@ -18,7 +31,6 @@ SUPPORTED_MODELS = {
 
 def extract_json_from_response(text: str) -> dict | None:
     """Extracts JSON from LM response, handling markdown code blocks and extra text."""
-    
     # Try to find JSON in code blocks first
     json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', text, re.DOTALL)
     if json_match:
@@ -26,7 +38,6 @@ def extract_json_from_response(text: str) -> dict | None:
             return json.loads(json_match.group(1))
         except json.JSONDecodeError:
             pass
-    
     # Try to find raw JSON
     json_match = re.search(r'\{.*\}', text, re.DOTALL)
     if json_match:
@@ -34,10 +45,8 @@ def extract_json_from_response(text: str) -> dict | None:
             return json.loads(json_match.group(0))
         except json.JSONDecodeError:
             pass
-    
     # Try parsing the whole thing
     try:
         return json.loads(text)
     except json.JSONDecodeError:
         return None
-
