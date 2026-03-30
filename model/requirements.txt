@@ -4,3 +4,4 @@ notebook
 ipykernel
 jupyterlab
 numpy<2
+matplotlib
