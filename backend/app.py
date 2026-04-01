@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api import lm_apis
+from src.api import game_api
 
 app = FastAPI()
 
@@ -19,4 +20,4 @@ app.add_middleware(
 )
 
 app.include_router(lm_apis.router)
-
+app.include_router(game_api.router)
