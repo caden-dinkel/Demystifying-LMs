@@ -13,15 +13,18 @@ import {
 import { SettingsPopover } from "../settings/settingsPopover";
 import { cn } from "@/lib/utils";
 
+// Define the structure for a simple navigation link
 interface NavLink {
   name: string;
   href: string;
 }
 
+// Define the structure for a main navigation item, which can optionally have subOptions
 interface NavItem extends NavLink {
   subOptions?: NavLink[];
 }
 
+// Data for sub-links
 const WorkNavLinks: NavLink[] = [
   { name: "How LMs Work", href: "/lms_work" },
   { name: "Tokenizing Text", href: "/lms_work/encode_tokens" },
@@ -43,11 +46,7 @@ const UsedNavLinks: NavLink[] = [
   { name: "Planning with LMs", href: "/lms_used/planning" },
 ];
 
-// ↓ NEW
-const GameNavLinks: NavLink[] = [
-  { name: "Word Association", href: "/word_game" },
-];
-
+// Combined navigation items data structure
 const NavItems: NavItem[] = [
   { name: "Home", href: "/" },
   {
@@ -64,11 +63,6 @@ const NavItems: NavItem[] = [
     name: "How Language Models Are Used",
     href: "/lms_used",
     subOptions: UsedNavLinks,
-  },
-  {
-    name: "Games",
-    href: "/word_game",
-    subOptions: GameNavLinks,
   },
 ];
 
