@@ -9,7 +9,7 @@ import {
   getHint,
   giveUp,
 } from "@/api/gameClient";
-import type { GuessResponse, HintResponse } from "@/api/gameClient";
+import type { GuessEntry, HintResponse } from "@/api/gameClient";
 import styles from "@/styles/main-layout.module.css";
 
 /* ================================================================= */
@@ -81,7 +81,7 @@ export default function WordGamePage() {
   const [gameId, setGameId] = useState<string | null>(null);
   const [totalWords, setTotalWords] = useState(0);
   const [targetCategory, setTargetCategory] = useState<string | null>(null);
-  const [guesses, setGuesses] = useState<GuessResponse[]>([]);
+  const [guesses, setGuesses] = useState<GuessEntry[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,12 +134,33 @@ export default function WordGamePage() {
 
   const handleGuess = async () => {
     if (!gameId || !input.trim()) return;
+
+    /* client-side duplicate check */
+    const lower = input.trim().toLowerCase();
+    if (
+      guesses.some(
+        (g) => g.word === lower || g.input_word === lower
+      )
+    ) {
+      setError(`You already guessed "${lower}".`);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setHint(null);
     try {
-      const r = await submitGuess(gameId, input.trim());
-      setGuesses((p) => [...p, r]);
+      const r = await submitGuess(gameId, lower);
+
+      /* also catch duplicates after lemmatisation */
+      if (guesses.some((g) => g.word === r.word)) {
+        setError(`"${lower}" reduces to "${r.word}" which you already guessed.`);
+        setLoading(false);
+        return;
+      }
+
+      const entry: GuessEntry = { ...r, guess_number: guesses.length + 1 };
+      setGuesses((p) => [...p, entry]);
       setInput("");
       if (r.is_correct) {
         setTargetWord(r.word);
@@ -153,11 +174,13 @@ export default function WordGamePage() {
   };
 
   const handleHint = async () => {
-    if (!gameId) return;
+    if (!gameId || guesses.length === 0) return;
     setLoading(true);
     setError(null);
     try {
-      const r = await getHint(gameId);
+      const lastGuess = guesses[guesses.length - 1].word;
+      const previousWords = guesses.map((g) => g.word);
+      const r = await getHint(gameId, lastGuess, previousWords);
       setHint(r);
       setHintsUsed((n) => n + 1);
     } catch (e) {
@@ -247,7 +270,7 @@ export default function WordGamePage() {
           {status === "playing" && targetCategory && (
             <div className="text-center py-2 px-4 rounded-md bg-muted/50 border border-border">
               <span className="text-sm text-muted-foreground">
-                The secret word is a:{" "}
+                The secret word is:{" "}
               </span>
               <span className="text-sm font-semibold">{targetCategory}</span>
             </div>
@@ -257,7 +280,7 @@ export default function WordGamePage() {
           {status === "won" && (
             <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-center">
               <p className="text-lg font-semibold text-green-700 dark:text-green-300">
-                You got it! The word was “{targetWord}”
+                🎉 You got it! The word was “{targetWord}”
               </p>
               <p className="text-sm text-muted-foreground">
                 Solved in {guesses.length} guess
@@ -379,7 +402,7 @@ export default function WordGamePage() {
                   </p>
                   {latest.input_word !== latest.word && (
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      “{latest.input_word}” → “
+                      “{latest.input_word}” → “
                       {latest.word}” (base form)
                     </p>
                   )}

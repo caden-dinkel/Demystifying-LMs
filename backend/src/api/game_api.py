@@ -1,6 +1,7 @@
 """
-Word Association Game API — v4
-Adds WordNet-based word categories as a second hint layer.
+Word Association Game API — v5 (stateless)
+Game state is encoded in the game_id token. No server-side storage.
+Works across any number of backend replicas without sticky sessions.
 """
 
 from pydantic import BaseModel
@@ -9,8 +10,9 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 import random
-import uuid
-import threading
+import hmac
+import hashlib
+import base64
 
 import nltk
 from nltk.stem import WordNetLemmatizer
@@ -31,7 +33,10 @@ def _lemmatize(word: str) -> str:
     for pos in ("v", "n", "a", "r"):
         candidates.add(_lemmatizer.lemmatize(word, pos=pos))
     valid = [c for c in candidates if len(c) >= 3]
-    return min(valid, key=len) if valid else word
+    if not valid:
+        return word
+    return min(valid, key=lambda c: (len(c), c))
+
 
 
 # ------------------------------------------------------------------ #
@@ -39,86 +44,61 @@ def _lemmatize(word: str) -> str:
 # ------------------------------------------------------------------ #
 
 _LEXNAME_TO_CATEGORY: dict[str, str] = {
-    # Animal
-    "noun.animal":        "Animal",
-
-    # Nature
-    "noun.plant":         "Nature",
-    "noun.phenomenon":    "Nature",
-    "noun.substance":     "Nature",
-    "verb.weather":       "Nature",
-
-    # Person
-    "noun.person":        "Person",
-    "noun.group":         "Person",
-    "noun.body":          "Person",
-    "verb.body":          "Person",
-    "verb.social":        "Person",
-
-    # Object
-    "noun.artifact":      "Object",
-    "noun.object":        "Object",
-    "noun.possession":    "Object",
-    "verb.possession":    "Object",
-
-    # Place
-    "noun.location":      "Place",
-
-    # Food
-    "noun.food":          "Food",
-    "verb.consumption":   "Food",
-
-    # Mind
-    "noun.cognition":     "Mind",
-    "noun.feeling":       "Mind",
-    "noun.state":         "Mind",
-    "noun.motive":        "Mind",
-    "verb.cognition":     "Mind",
-    "verb.emotion":       "Mind",
-    "verb.perception":    "Mind",
-
-    # Communication
+    "noun.animal": "Animal",
+    "noun.plant": "Nature",
+    "noun.phenomenon": "Nature",
+    "noun.substance": "Nature",
+    "verb.weather": "Nature",
+    "noun.person": "Person",
+    "noun.group": "Person",
+    "noun.body": "Person",
+    "verb.body": "Person",
+    "verb.social": "Person",
+    "noun.artifact": "Object",
+    "noun.object": "Object",
+    "noun.possession": "Object",
+    "verb.possession": "Object",
+    "noun.location": "Place",
+    "noun.food": "Food",
+    "verb.consumption": "Food",
+    "noun.cognition": "Mind",
+    "noun.feeling": "Mind",
+    "noun.state": "Mind",
+    "noun.motive": "Mind",
+    "verb.cognition": "Mind",
+    "verb.emotion": "Mind",
+    "verb.perception": "Mind",
     "noun.communication": "Communication",
     "verb.communication": "Communication",
-
-    # Action
-    "noun.act":           "Action",
-    "noun.event":         "Action",
-    "noun.process":       "Action",
-    "verb.motion":        "Action",
-    "verb.contact":       "Action",
-    "verb.competition":   "Action",
-    "verb.creation":      "Action",
-    "verb.change":        "Action",
-
-    # Descriptor
-    "noun.attribute":     "Descriptor",
-    "noun.shape":         "Descriptor",
-    "noun.relation":      "Descriptor",
-    "verb.stative":       "Descriptor",
-    "adj.all":            "Descriptor",
-    "adj.pert":           "Descriptor",
-    "adj.ppl":            "Descriptor",
-    "adv.all":            "Descriptor",
-
-    # Measurement
-    "noun.quantity":      "Measurement",
-    "noun.time":          "Measurement",
-
-    # General (fallback)
-    "noun.Tops":          "General",
+    "noun.act": "Action",
+    "noun.event": "Action",
+    "noun.process": "Action",
+    "verb.motion": "Action",
+    "verb.contact": "Action",
+    "verb.competition": "Action",
+    "verb.creation": "Action",
+    "verb.change": "Action",
+    "noun.attribute": "Descriptor",
+    "noun.shape": "Descriptor",
+    "noun.relation": "Descriptor",
+    "verb.stative": "Descriptor",
+    "adj.all": "Descriptor",
+    "adj.pert": "Descriptor",
+    "adj.ppl": "Descriptor",
+    "adv.all": "Descriptor",
+    "noun.quantity": "Measurement",
+    "noun.time": "Measurement",
+    "noun.Tops": "General",
 }
 
 _DEFAULT_CATEGORY = "General"
 
 
 def _get_category(word: str) -> str:
-    """Look up the broad semantic category of a word via WordNet."""
     synsets = wn.synsets(word)
     if not synsets:
         return _DEFAULT_CATEGORY
-    lexname = synsets[0].lexname()
-    return _LEXNAME_TO_CATEGORY.get(lexname, _DEFAULT_CATEGORY)
+    return _LEXNAME_TO_CATEGORY.get(synsets[0].lexname(), _DEFAULT_CATEGORY)
 
 
 # ------------------------------------------------------------------ #
@@ -168,82 +148,87 @@ _word_embeddings_norm = F.normalize(_avg_embeddings, p=2, dim=1)
 
 TOTAL_WORDS = len(WORD_NAMES)
 
-# Precompute categories for every word
 print("Word Game: assigning categories…")
 WORD_CATEGORIES: list[str] = [_get_category(w) for w in WORD_NAMES]
-print(f"Word Game: {TOTAL_WORDS} words loaded across "
-      f"{len(set(WORD_CATEGORIES))} categories.")
+print(
+    f"Word Game: {TOTAL_WORDS} words loaded across "
+    f"{len(set(WORD_CATEGORIES))} categories."
+)
 
 HINT_FACTOR = 0.10
 
 # ------------------------------------------------------------------ #
-#  Game state
+#  Stateless game-id token  (HMAC-signed target index)
 # ------------------------------------------------------------------ #
 
-_games: dict[str, "GameState"] = {}
-_games_lock = threading.Lock()
+_GAME_SECRET = b"dmlm-word-game-v5-secret"
 
 
-class GameState:
+def _encode_game_id(target_idx: int) -> str:
+    payload = str(target_idx).encode()
+    sig = hmac.new(_GAME_SECRET, payload, hashlib.sha256).hexdigest()[:16]
+    return base64.urlsafe_b64encode(f"{target_idx}:{sig}".encode()).decode()
 
-    def __init__(self) -> None:
-        self.game_id: str = str(uuid.uuid4())
-        self.target_idx: int = random.randint(0, TOTAL_WORDS - 1)
-        self.target_word: str = WORD_NAMES[self.target_idx]
-        self.target_category: str = WORD_CATEGORIES[self.target_idx]
-        target_emb = _word_embeddings_norm[self.target_idx]
 
-        sims = torch.mv(_word_embeddings_norm, target_emb)
-        self.similarities: np.ndarray = sims.numpy()
+def _decode_game_id(game_id: str) -> int:
+    try:
+        decoded = base64.urlsafe_b64decode(game_id.encode()).decode()
+        idx_str, sig = decoded.rsplit(":", 1)
+        expected = hmac.new(
+            _GAME_SECRET, idx_str.encode(), hashlib.sha256
+        ).hexdigest()[:16]
+        if not hmac.compare_digest(sig, expected):
+            raise ValueError()
+        idx = int(idx_str)
+        if idx < 0 or idx >= TOTAL_WORDS:
+            raise ValueError()
+        return idx
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid or expired game ID.")
 
-        sorted_idx = np.argsort(-self.similarities)
-        self.sorted_indices: np.ndarray = sorted_idx
-        self.rank_of: dict[int, int] = {
-            int(idx): r + 1 for r, idx in enumerate(sorted_idx)
-        }
-        self.guesses: list[str] = []
 
-    @staticmethod
-    def percentile_of(rank: int) -> float:
-        if rank == 1:
-            return 100.0
-        return round(100.0 * (1.0 - rank / TOTAL_WORDS), 1)
+# ------------------------------------------------------------------ #
+#  Helpers (recomputed per request — fast for 10k words)
+# ------------------------------------------------------------------ #
 
-    @staticmethod
-    def get_hot_cold(rank: int) -> str:
-        if rank == 1:
-            return "🎯 Exact!"
-        pct = rank / TOTAL_WORDS
-        if pct <= 0.01:
-            return "🔥 Burning"
-        if pct <= 0.05:
-            return "🔥 Hot"
-        if pct <= 0.15:
-            return "☀️ Warm"
-        if pct <= 0.35:
-            return "🌤️ Lukewarm"
-        if pct <= 0.60:
-            return "❄️ Cold"
-        return "🧊 Freezing"
 
-    def get_hint_for_last_guess(self) -> tuple[str, float]:
-        last_idx = WORD_TO_IDX[self.guesses[-1]]
-        current_sim = float(self.similarities[last_idx])
-        goal_sim = current_sim + HINT_FACTOR * (1.0 - current_sim)
+def _compute_similarities(target_idx: int) -> np.ndarray:
+    target_emb = _word_embeddings_norm[target_idx]
+    return torch.mv(_word_embeddings_norm, target_emb).numpy()
 
-        diffs = np.abs(self.similarities - goal_sim)
-        diffs[self.target_idx] = np.inf
-        for w in self.guesses:
-            diffs[WORD_TO_IDX[w]] = np.inf
 
-        hint_idx = int(np.argmin(diffs))
-        hint_sim = round(float(self.similarities[hint_idx]) * 100, 2)
-        return WORD_NAMES[hint_idx], hint_sim
+def _rank_of(sims: np.ndarray, word_idx: int) -> int:
+    """1-based rank: how many words have strictly higher similarity + 1."""
+    return int((sims > sims[word_idx]).sum()) + 1
+
+
+def _percentile_of(rank: int) -> float:
+    if rank == 1:
+        return 100.0
+    return round(100.0 * (1.0 - rank / TOTAL_WORDS), 1)
+
+
+def _hot_cold(rank: int) -> str:
+    if rank == 1:
+        return "🎯 Exact!"
+    pct = rank / TOTAL_WORDS
+    if pct <= 0.01:
+        return "🔥 Burning"
+    if pct <= 0.05:
+        return "🔥 Hot"
+    if pct <= 0.15:
+        return "☀️ Warm"
+    if pct <= 0.35:
+        return "🌤️ Lukewarm"
+    if pct <= 0.60:
+        return "❄️ Cold"
+    return "🧊 Freezing"
 
 
 # ------------------------------------------------------------------ #
 #  Schemas
 # ------------------------------------------------------------------ #
+
 
 class StartGameResponse(BaseModel):
     game_id: str
@@ -262,7 +247,6 @@ class GuessResponse(BaseModel):
     similarity: float
     percentile: float
     hot_cold: str
-    guess_number: int
     is_correct: bool
     word_category: str
     category_match: bool
@@ -270,6 +254,8 @@ class GuessResponse(BaseModel):
 
 class HintRequest(BaseModel):
     game_id: str
+    last_guess: str
+    previous_guesses: list[str] = []
 
 
 class HintResponse(BaseModel):
@@ -277,34 +263,34 @@ class HintResponse(BaseModel):
     hint_similarity: float
 
 
+class GiveUpRequest(BaseModel):
+    game_id: str
+
+
 class GiveUpResponse(BaseModel):
     target_word: str
-    total_guesses: int
 
 
 # ------------------------------------------------------------------ #
 #  Endpoints
 # ------------------------------------------------------------------ #
 
+
 @router.post("/start", response_model=StartGameResponse)
 async def start_game():
-    game = GameState()
-    with _games_lock:
-        _games[game.game_id] = game
-    print(f"Game {game.game_id[:8]}… target: '{game.target_word}' ({game.target_category})")
+    target_idx = random.randint(0, TOTAL_WORDS - 1)
+    game_id = _encode_game_id(target_idx)
+    print(f"Game started — target: '{WORD_NAMES[target_idx]}' ({WORD_CATEGORIES[target_idx]})")
     return StartGameResponse(
-        game_id=game.game_id,
+        game_id=game_id,
         total_words=TOTAL_WORDS,
-        target_category=game.target_category,
+        target_category=WORD_CATEGORIES[target_idx],
     )
 
 
 @router.post("/guess", response_model=GuessResponse)
 async def submit_guess(req: GuessRequest):
-    with _games_lock:
-        game = _games.get(req.game_id)
-    if not game:
-        raise HTTPException(status_code=404, detail="Game not found. Start a new game.")
+    target_idx = _decode_game_id(req.game_id)
 
     raw = req.word.lower().strip()
     word = _lemmatize(raw)
@@ -315,31 +301,23 @@ async def submit_guess(req: GuessRequest):
             msg = f"'{raw}' (base form: '{word}') is not in the vocabulary."
         raise HTTPException(status_code=400, detail=msg)
 
-    if word in game.guesses:
-        raise HTTPException(status_code=400, detail=f"You already guessed '{word}'.")
-
     idx = WORD_TO_IDX[word]
-    similarity = round(float(game.similarities[idx]) * 100, 2)
-    rank = game.rank_of[idx]
-    percentile = GameState.percentile_of(rank)
-    hot_cold = GameState.get_hot_cold(rank)
+    sims = _compute_similarities(target_idx)
+
+    similarity = round(float(sims[idx]) * 100, 2)
+    rank = _rank_of(sims, idx)
+    percentile = _percentile_of(rank)
+    hot_cold_label = _hot_cold(rank)
     word_category = WORD_CATEGORIES[idx]
-    category_match = word_category == game.target_category
-
-    game.guesses.append(word)
-
-    is_correct = rank == 1
-    if is_correct:
-        with _games_lock:
-            _games.pop(req.game_id, None)
+    category_match = word_category == WORD_CATEGORIES[target_idx]
+    is_correct = idx == target_idx
 
     return GuessResponse(
         word=word,
         input_word=raw,
         similarity=similarity,
         percentile=percentile,
-        hot_cold=hot_cold,
-        guess_number=len(game.guesses),
+        hot_cold=hot_cold_label,
         is_correct=is_correct,
         word_category=word_category,
         category_match=category_match,
@@ -348,21 +326,32 @@ async def submit_guess(req: GuessRequest):
 
 @router.post("/hint", response_model=HintResponse)
 async def get_hint(req: HintRequest):
-    with _games_lock:
-        game = _games.get(req.game_id)
-    if not game:
-        raise HTTPException(status_code=404, detail="Game not found.")
-    if not game.guesses:
-        raise HTTPException(status_code=400, detail="Make at least one guess first.")
+    target_idx = _decode_game_id(req.game_id)
 
-    hint_word, hint_sim = game.get_hint_for_last_guess()
-    return HintResponse(hint_word=hint_word, hint_similarity=hint_sim)
+    last_word = _lemmatize(req.last_guess.lower().strip())
+    if last_word not in WORD_TO_IDX:
+        raise HTTPException(status_code=400, detail="Last guess not recognised.")
+
+    sims = _compute_similarities(target_idx)
+
+    last_idx = WORD_TO_IDX[last_word]
+    current_sim = float(sims[last_idx])
+    goal_sim = current_sim + HINT_FACTOR * (1.0 - current_sim)
+
+    diffs = np.abs(sims - goal_sim)
+    diffs[target_idx] = np.inf
+
+    for w in req.previous_guesses:
+        lemma = _lemmatize(w.lower().strip())
+        if lemma in WORD_TO_IDX:
+            diffs[WORD_TO_IDX[lemma]] = np.inf
+
+    hint_idx = int(np.argmin(diffs))
+    hint_sim = round(float(sims[hint_idx]) * 100, 2)
+    return HintResponse(hint_word=WORD_NAMES[hint_idx], hint_similarity=hint_sim)
 
 
 @router.post("/give_up", response_model=GiveUpResponse)
-async def give_up(req: HintRequest):
-    with _games_lock:
-        game = _games.pop(req.game_id, None)
-    if not game:
-        raise HTTPException(status_code=404, detail="Game not found.")
-    return GiveUpResponse(target_word=game.target_word, total_guesses=len(game.guesses))
+async def give_up(req: GiveUpRequest):
+    target_idx = _decode_game_id(req.game_id)
+    return GiveUpResponse(target_word=WORD_NAMES[target_idx])

@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "/api";
+
+/* ---------- response types ---------- */
 
 export interface StartGameResponse {
   game_id: string;
@@ -14,7 +16,6 @@ export interface GuessResponse {
   similarity: number;
   percentile: number;
   hot_cold: string;
-  guess_number: number;
   is_correct: boolean;
   word_category: string;
   category_match: boolean;
@@ -27,8 +28,15 @@ export interface HintResponse {
 
 export interface GiveUpResponse {
   target_word: string;
-  total_guesses: number;
 }
+
+/* ---------- enriched client-side entry ---------- */
+
+export interface GuessEntry extends GuessResponse {
+  guess_number: number;
+}
+
+/* ---------- API calls ---------- */
 
 export async function startGame(): Promise<StartGameResponse> {
   const res = await axios.post<StartGameResponse>(`${API_BASE}/game/start`);
@@ -46,9 +54,15 @@ export async function submitGuess(
   return res.data;
 }
 
-export async function getHint(gameId: string): Promise<HintResponse> {
+export async function getHint(
+  gameId: string,
+  lastGuess: string,
+  previousGuesses: string[]
+): Promise<HintResponse> {
   const res = await axios.post<HintResponse>(`${API_BASE}/game/hint`, {
     game_id: gameId,
+    last_guess: lastGuess,
+    previous_guesses: previousGuesses,
   });
   return res.data;
 }
